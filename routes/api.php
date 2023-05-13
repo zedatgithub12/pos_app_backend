@@ -19,7 +19,7 @@ use App\Http\Controllers\CustomerController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/adduser', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:api')->group(function () {
@@ -54,14 +54,18 @@ Route::delete('deletecategory/{id}', [CategoryController::class, 'destroy']);
 // Sales routes
 Route::get('viewsale', [SalesController::class, 'index']);
 Route::post('createsale', [SalesController::class, 'store']);
-Route::put('editsale/{id}', [SalesController::class, 'update']);
+Route::post('updatesale/{id}', [SalesController::class, 'update']);
 Route::delete('deletesale/{id}', [SalesController::class, 'destroy']);
 // Customers routes
-Route::get('/customers', [CustomerController::class, 'index']);
-Route::post('/customers', [CustomerController::class, 'store']);
-Route::put('/customers/{id}', [CustomerController::class, 'update']);
-Route::delete('/customers/{id}', [CustomerController::class, 'destroy']);
+Route::get('viewcustomer', [CustomerController::class, 'index']);
+Route::post('addcustomer', [CustomerController::class, 'store']);
+Route::post('updatecustomer/{id}', [CustomerController::class, 'update']);
+Route::delete('deletecustomer/{id}', [CustomerController::class, 'destroy']);
 
+//user routes
+Route::get('viewuser', [AuthController::class, 'index']);
+Route::post('updateuser/{id}', [AuthController::class, 'update']);
+Route::delete('deleteuser/{id}', [AuthController::class, 'destroy']);
 Route::get('images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
 

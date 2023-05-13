@@ -89,15 +89,14 @@ class SalesController extends Controller
         $sale->user = $request->user;
         $sale->shop = $request->shop;
         $sale->customer = $request->customer;
-        $sale->products = json_encode($request->products);
+        $sale->items = json_encode($request->products);
         $sale->tax = $request->tax;
         $sale->discount = $request->discount;
-        $sale->grand_total = $request->grandTotal;
+        $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;
         $sale->note = $request->note;
-        $sale->sale_date = date('Y-m-d', strtotime($request->sale_date));
-        $sale->sale_time = date('H:i:s', strtotime($request->sale_time));
+
         $sale->save();
 
         return response()->json(['success' => true, 'message' => 'Sale updated successfully']);
@@ -108,7 +107,7 @@ class SalesController extends Controller
      */
     public function destroy($id)
     {
-        $sale = Sale::findOrFail($id);
+        $sale = Sale::find($id);
         if (!$sale) {
             return response()->json(['success' => false, 'message' => 'Record not found'], 404);
         }

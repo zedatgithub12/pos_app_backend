@@ -15,6 +15,7 @@ class CustomerController extends Controller
         $customers = Customer::all();
 
         return response()->json([
+            'success' => true,
             'data' => $customers
         ], 200);
     }
@@ -38,12 +39,13 @@ class CustomerController extends Controller
             'shop' => 'required',
         ]);
 
-        $customer = Customer::create($validatedData);
+        $customer = new Customer;
+        $customer->name = $request->name;
+        $customer->phone = $request->phone;
+        $customer->shop = $request->shop;
+        $customer->save();
 
-        return response()->json([
-            'message' => 'Customer created successfully',
-            'data' => $customer
-        ], 201);
+        return response()->json(['success' => true, 'message' => 'Customer added successfully.']);
     }
 
     /**
@@ -67,17 +69,25 @@ class CustomerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $customer = Customer::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'shop' => 'required',
-        ]);
+        $customer = Customer::find($id);
 
-        $customer->update($validatedData);
+        if ($request->has('name')) {
+            $customer->name = $request->name;
+        }
+
+        if ($request->has('phone')) {
+            $customer->phone = $request->phone;
+        }
+
+        if ($request->has('shop')) {
+            $customer->shop = $request->shop;
+        }
+        $customer->save();
+
 
         return response()->json([
+            'success' => true,
             'message' => 'Customer updated successfully',
             'data' => $customer
         ], 200);
@@ -88,12 +98,16 @@ class CustomerController extends Controller
      */
     public function destroy($id)
     {
-        $customer = Customer::findOrFail($id);
-
+        $customer = Customer::find($id);
+        if (!$customer) {
+            return response()->json(['success' => false, 'message' => 'Record not found'], 404);
+        }
         $customer->delete();
 
         return response()->json([
-            'message' => 'Customer deleted successfully'
+            'success' => true,
+            'message' => 'Customer deleted successfully',
         ], 200);
+
     }
 }
