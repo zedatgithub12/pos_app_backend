@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShopStatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AdminStatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,13 +32,17 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+
+//get statistics
+Route::get('adminstat', [AdminStatController::class, 'Stats']);
+Route::get('shopstat', [ShopStatController::class, 'Stats']);
 //Store routes
 Route::get('viewstore', [StoreController::class, 'index']);
 Route::get('/stores/{id}', [StoreController::class, 'show']);
 Route::post('createstore', [StoreController::class, 'store']);
 Route::post('updatestore/{id}', [StoreController::class, 'update']);
 Route::delete('deletestore/{id}', [StoreController::class, 'destroy']);
-
+Route::post('addmanager/{id}', [StoreController::class, 'addmanager']);
 //product routes
 Route::get('viewproduct', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);

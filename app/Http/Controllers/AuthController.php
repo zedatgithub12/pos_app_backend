@@ -38,11 +38,12 @@ class AuthController extends Controller
         if ($email) {
             return response()->json(['success' => false, 'message' => 'This email already taken.']);
         }
+        $password = $request->password;
 
         $user = new User();
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = bcrypt($request->password);
+        $user->password = bcrypt($password);
         $user->role = $request->role;
         $user->email_verified_at = now(); // set the email_verified_at field to the current date and time
         $user->remember_token = Str::random(60); // generate a new remember token for the user

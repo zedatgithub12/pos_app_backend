@@ -29,7 +29,10 @@ class StoreController extends Controller
             'address' => 'required',
             'phone' => 'required'
         ]);
-
+        $storename = Store::where('name', $request->name)->first();
+        if ($storename) {
+            return response()->json(['success' => false, 'message' => 'The shop name is taken.']);
+        }
         $store = new Store();
         $store->name = $request->input('name');
         $store->address = $request->input('address');
@@ -71,6 +74,7 @@ class StoreController extends Controller
     {
         $store = Store::find($id);
         $store->name = $request->input('name');
+        $store->manager = $request->input('manager');
         $store->address = $request->input('address');
         $store->description = $request->input('description');
         $store->phone = $request->input('phone');
@@ -96,7 +100,17 @@ class StoreController extends Controller
             'data' => $store
         ], 201);
     }
+    public function addmanager(Request $request, string $id)
+    {
 
+        $store = Store::find($id);
+        $store->manager = $request->input('manager');
+        $store->save();
+        return response()->json([
+            'success' => true,
+            'message' => 'Manager Added successfully.',
+        ], 201);
+    }
     public function destroy(string $id)
     {
         $record = Store::find($id);
