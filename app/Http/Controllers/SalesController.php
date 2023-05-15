@@ -54,6 +54,22 @@ class SalesController extends Controller
         $sale->reference = $referenceNumber;
         $sale->date = date('Y-m-d');
         $sale->time = date('H:i:s');
+
+        
+        $items = json_decode($sale->items, true);
+        foreach ($items as $item) {
+            $product = Product::find($item['id']);
+            $newQuantity = $product->quantity - $item['quantity'];
+            if ($newQuantity < 0) {
+                return response()->json(['error' => 'Quantity sold is greater than product quantity.'], 400);
+            }
+            $product->quantity = $newQuantity;
+            if ($newQuantity == 0) {
+                $product->status = 'out-stock';
+            }
+            $product->save();
+        }
+
         $sale->save();
 
         // foreach ($sale->products as $product_sold) {

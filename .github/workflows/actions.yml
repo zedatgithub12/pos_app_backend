@@ -1,0 +1,32 @@
+name: "chircharo"
+on:
+  pull_request:
+  push:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: addischircharoco_addis_chircharo
+          MYSQL_USER: addischircharoco_admin
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, pdo, pdo_mysql
+      - name: Install dependencies
+        run: composer install
+      - name: Run database migrations
+        run: php artisan migrate
+      - name: Run tests
+        run: vendor/bin/phpunit

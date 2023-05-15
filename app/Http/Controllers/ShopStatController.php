@@ -50,6 +50,10 @@ class ShopStatController extends Controller
             ->count();
 
         // Get the total number of categories and customers for the given shop
+        $totalProducts = DB::table('products')
+            ->where('shop', $shopName)
+            ->where('status', 'In-stock')
+            ->count();
         $totalCategories = DB::table('categories')->count();
 
         $totalCustomers = DB::table('customers')
@@ -76,6 +80,7 @@ class ShopStatController extends Controller
                 'monthlySales' => $monthlySales,
                 'annualEarnings' => $annualEarnings,
                 'annualSales' => $annualSales,
+                'totalProducts' => $totalProducts,
                 'totalCategories' => $totalCategories,
                 'totalCustomers' => $totalCustomers,
                 'topProducts' => $topProducts

@@ -47,6 +47,7 @@ class AdminStatController extends Controller
 
 
         // Get the total number of categories and customers
+        $totalproducts = DB::table('products')->where('status', 'In-stock')->count();
         $totalCategories = DB::table('categories')->count();
         $totalCustomers = DB::table('customers')->count();
         // Next, get the 12 products with the highest demand:
@@ -68,6 +69,7 @@ class AdminStatController extends Controller
                 'monthlySales' => $monthlySales,
                 'annualEarnings' => $annualEarnings,
                 'annualSales' => $annualSales,
+                'totalProducts' => $totalproducts,
                 'totalCategories' => $totalCategories,
                 'totalCustomers' => $totalCustomers,
                 'topProducts' => $topProducts
