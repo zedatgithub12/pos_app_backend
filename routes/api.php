@@ -45,6 +45,7 @@ Route::delete('deletestore/{id}', [StoreController::class, 'destroy']);
 Route::post('addmanager/{id}', [StoreController::class, 'addmanager']);
 //product routes
 Route::get('viewproduct', [ProductController::class, 'index']);
+Route::get('viewstoreproduct/{name}', [ProductController::class, 'storeproduct']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::post('addproduct', [ProductController::class, 'store']);
 Route::post('updateproduct/{id}', [ProductController::class, 'update']);
@@ -59,6 +60,7 @@ Route::delete('deletecategory/{id}', [CategoryController::class, 'destroy']);
 
 // Sales routes
 Route::get('viewsale', [SalesController::class, 'index']);
+Route::get('viewstoresale/{name}', [SalesController::class, 'storesale']);
 Route::post('createsale', [SalesController::class, 'store']);
 Route::post('updatesale/{id}', [SalesController::class, 'update']);
 Route::delete('deletesale/{id}', [SalesController::class, 'destroy']);

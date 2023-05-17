@@ -82,14 +82,56 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Invalid email or password']);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'success' => true,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-            'user' => $user,
-        ]);
+        if ($user) {
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+            if ($user->role === 'Admin') {
+                $response = response()->json([
+                    'success' => true,
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'user' => $user,
+                ]);
+            } else if ($user->role === 'Sales') {
+
+                $token = $user->createToken('auth_token')->plainTextToken;
+                $userWithStore = DB::table('users')
+                    ->join('stores', 'users.id', '=', 'stores.manager_id')
+                    ->where('users.id', '=', $user->id)
+                    ->select('users.*', 'stores.id as store_id', 'stores.name as store_name')
+                    ->first();
+
+                $response = response()->json([
+                    'success' => true,
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'user' => $userWithStore,
+                ]);
+            } else {
+                // Handle other user roles or invalid roles as needed
+                $response = response()->json([
+                    'success' => false,
+                    'message' => 'Invalid user role',
+                ]);
+            }
+        } else {
+            // Handle invalid user credentials as needed
+            $response = response()->json([
+                'success' => false,
+                'message' => 'Invalid email or password',
+            ]);
+        }
+
+        return $response;
+
+
+        // return response()->json([
+        //     'success' => true,
+        //     'access_token' => $token,
+        //     'token_type' => 'Bearer',
+        //     'user' => $user,
+        // ]);
     }
     public function logout()
     {

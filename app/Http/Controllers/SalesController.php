@@ -21,7 +21,21 @@ class SalesController extends Controller
             'data' => $sales
         ], 200);
     }
+    /**
+     * Display a listing of the resource.
+     */
+    public function storesale(string $name)
+    {
+        $sales = Sale::where('shop', '=', $name)->get();
 
+        return response()->json([
+            'success' => true,
+            'message' => 'Sales retrieved successfully',
+            'data' => $sales
+        ], 200);
+
+
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -55,7 +69,7 @@ class SalesController extends Controller
         $sale->date = date('Y-m-d');
         $sale->time = date('H:i:s');
 
-        
+
         $items = json_decode($sale->items, true);
         foreach ($items as $item) {
             $product = Product::find($item['id']);

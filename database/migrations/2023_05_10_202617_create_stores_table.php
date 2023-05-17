@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('phone');
             $table->text('description')->nullable();
             $table->text('profile_image')->nullable();
+            $table->integer('manager_id')->nullable();
             $table->string('manager')->nullable();
             $table->string('status')->nullable();
             $table->timestamps();

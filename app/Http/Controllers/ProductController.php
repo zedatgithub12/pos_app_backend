@@ -20,7 +20,19 @@ class ProductController extends Controller
         ], 200);
 
     }
+   /**
+     * Display a listing of items in store
+     */public function storeproduct(string $name)
+     {
+       
+        $products = Product::where('shop', '=', $name)->get();
 
+        return response()->json([
+            'success' => true,
+            'data' => $products
+        ], 200);
+
+    }
     /**
      * Show the form for creating a new resource.
      */

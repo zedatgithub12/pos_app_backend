@@ -14,6 +14,7 @@ class Store extends Model
         'phone',
         'description',
         'profile_image',
+        'manager_id',
         'manager',
         'status',
     ];

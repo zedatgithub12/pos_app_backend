@@ -74,6 +74,7 @@ class StoreController extends Controller
     {
         $store = Store::find($id);
         $store->name = $request->input('name');
+        $store->manager_id = $request->input('manager_id');
         $store->manager = $request->input('manager');
         $store->address = $request->input('address');
         $store->description = $request->input('description');
@@ -104,6 +105,7 @@ class StoreController extends Controller
     {
 
         $store = Store::find($id);
+        $store->manager_id = $request->input('manager_id');
         $store->manager = $request->input('manager');
         $store->save();
         return response()->json([
