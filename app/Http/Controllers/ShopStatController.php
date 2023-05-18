@@ -62,14 +62,13 @@ class ShopStatController extends Controller
 
         // Next, get the 12 products with the highest demand for the given shop:
 
-        $topProducts = DB::table('sales')
-            ->select('products.name', DB::raw('SUM(products.quantity) as totalQuantity'))
-            ->join('products', 'sales.id', '=', 'products.id')
-            ->where('sales.shop', $shopName)
-            ->groupBy('products.name')
-            ->orderBy('totalQuantity', 'desc')
+        $topProducts = DB::table('products')
+            ->where('products.shop', $shopName)
+            ->orderBy('quantity', 'desc')
             ->take(12)
             ->get();
+
+
 
         // Finally, display the results:
 

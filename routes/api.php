@@ -66,6 +66,7 @@ Route::post('updatesale/{id}', [SalesController::class, 'update']);
 Route::delete('deletesale/{id}', [SalesController::class, 'destroy']);
 // Customers routes
 Route::get('viewcustomer', [CustomerController::class, 'index']);
+Route::get('viewstorecustomer/{name}', [CustomerController::class, 'storecustomer']);
 Route::post('addcustomer', [CustomerController::class, 'store']);
 Route::post('updatecustomer/{id}', [CustomerController::class, 'update']);
 Route::delete('deletecustomer/{id}', [CustomerController::class, 'destroy']);

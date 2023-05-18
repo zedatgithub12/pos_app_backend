@@ -19,7 +19,17 @@ class CustomerController extends Controller
             'data' => $customers
         ], 200);
     }
-
+    /**
+     * Display a lis of customer with sales role
+     */
+    public function storecustomer(string $name)
+    {
+        $customers = Customer::where('shop', '=', $name)->get();
+        return response()->json([
+            'success' => true,
+            'data' => $customers
+        ], 200);
+    }
     /**
      * Show the form for creating a new resource.
      */

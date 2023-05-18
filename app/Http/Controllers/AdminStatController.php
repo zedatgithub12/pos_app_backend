@@ -52,14 +52,11 @@ class AdminStatController extends Controller
         $totalCustomers = DB::table('customers')->count();
         // Next, get the 12 products with the highest demand:
 
-        $topProducts = DB::table('sales')
-            ->select('products.name', DB::raw('SUM(products.quantity) as totalQuantity'))
-            ->join('products', 'sales.id', '=', 'products.id')
-            ->groupBy('products.name')
-            ->orderBy('totalQuantity', 'desc')
+
+        $topProducts = DB::table('products')
+            ->orderBy('quantity', 'desc')
             ->take(12)
             ->get();
-
         // Finally, display the results:
 
         return response()->json([
