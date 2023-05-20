@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ShopStatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +76,12 @@ Route::delete('deletecustomer/{id}', [CustomerController::class, 'destroy']);
 Route::get('viewuser', [AuthController::class, 'index']);
 Route::post('updateuser/{id}', [AuthController::class, 'update']);
 Route::delete('deleteuser/{id}', [AuthController::class, 'destroy']);
+
+//price update route
+Route::get('priceupdates/{id}', [PriceUpdateController::class, 'index']);
+Route::post('updateprice', [PriceUpdateController::class, 'store']);
+
+
 Route::get('images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
 

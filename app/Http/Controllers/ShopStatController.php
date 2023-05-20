@@ -68,8 +68,6 @@ class ShopStatController extends Controller
             ->take(12)
             ->get();
 
-
-
         // Finally, display the results:
 
         return response()->json([
