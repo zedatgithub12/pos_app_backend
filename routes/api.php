@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ShopStatController;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ use App\Http\Controllers\AdminStatController;
 */
 Route::post('/adduser', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::post('forgotpassword', [ForgotPasswordController::class, 'forgotpassword']);
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
@@ -32,7 +33,6 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-
 
 //get statistics
 Route::get('adminstat', [AdminStatController::class, 'Stats']);
