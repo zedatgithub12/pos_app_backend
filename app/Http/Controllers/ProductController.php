@@ -20,11 +20,11 @@ class ProductController extends Controller
         ], 200);
 
     }
-   /**
+    /**
      * Display a listing of items in store
      */public function storeproduct(string $name)
-     {
-       
+    {
+
         $products = Product::where('shop', '=', $name)->get();
 
         return response()->json([
@@ -94,7 +94,16 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        $items = Product::where('code', $product->code)
+            ->where('status', 'In-stock')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'product' => $product,
+            'items' => $items,
+        ]);
     }
 
     /**

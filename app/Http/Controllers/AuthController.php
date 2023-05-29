@@ -141,7 +141,36 @@ class AuthController extends Controller
             'message' => 'Logout successful'
         ], 200);
     }
+    public function changepass(Request $request, string $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
 
+        $this->validate($request, [
+            'oldPassword' => 'required',
+            'newPassword' => 'required|string',
+        ]);
+
+        $hashedPassword = $user->password;
+
+        if (Hash::check($request->oldPassword, $hashedPassword)) {
+
+            $user->fill([
+                'password' => Hash::make($request->newPassword)
+            ])->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'Password Updated Successfully ',
+
+            ], 201);
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'password does not match'], 401);
+        }
+
+    }
 
     public function update(Request $request, $id)
     {

@@ -26,6 +26,7 @@ use App\Http\Controllers\AdminStatController;
 Route::post('/adduser', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('forgotpassword', [ForgotPasswordController::class, 'forgotpassword']);
+Route::put('changepass/{id}', [AuthController::class, 'changepass']);
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
