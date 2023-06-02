@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sale;
 use App\Models\Product;
+use App\Models\Notification;
 
 class SalesController extends Controller
 {
@@ -80,6 +81,16 @@ class SalesController extends Controller
             $product->quantity = $newQuantity;
             if ($newQuantity == 0) {
                 $product->status = 'out-stock';
+                $Notification = new Notification();
+                $Notification->title = $product->name . " is ended";
+                $Notification->time = date('H:i:s');
+                $Notification->message = $product->name . " is out of stock take action please!";
+                $Notification->type = 'stock';
+                $Notification->itemid = $product->id;
+                $Notification->recipient = "1";
+                $Notification->status = "unseen";
+
+                $Notification->save();
             }
             $product->save();
         }
