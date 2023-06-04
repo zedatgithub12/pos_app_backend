@@ -11,7 +11,7 @@ class NotificationController extends Controller
      * Display a listing of the resource.
      */public function index()
     {
-        $Notification = Notification::all();
+        $Notification = Notification::orderBy('id', 'DESC')->get();
 
         return response()->json([
             'success' => true,
@@ -24,7 +24,7 @@ class NotificationController extends Controller
      */public function storeNotification(string $id)
     {
 
-        $Notification = Notification::where('recipient', '=', $id)->get();
+        $Notification = Notification::where('recipient', '=', $id)->orderBy('id', 'DESC')->get();
 
         return response()->json([
             'success' => true,

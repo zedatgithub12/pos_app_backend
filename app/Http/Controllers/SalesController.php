@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Sale;
 use App\Models\Product;
 use App\Models\Notification;
+use App\Events\NewNotification;
 
 class SalesController extends Controller
 {
@@ -93,6 +94,8 @@ class SalesController extends Controller
                 $Notification->status = "unseen";
 
                 $Notification->save();
+
+
             }
             $product->save();
         }

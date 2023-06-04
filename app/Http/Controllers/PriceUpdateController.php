@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\PriceUpdates;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -63,7 +64,17 @@ class PriceUpdateController extends Controller
         $product->price = $newPrice->to;
         $product->save();
 
+        $shop = Store::where('name', $product->shop)->first();
+        $Notification = new Notification();
+        $Notification->title = $product->name . " Price is Updated";
+        $Notification->time = date('H:i:s');
+        $Notification->message = "price is changed from " . $request->from . " to " . $newPrice->to;
+        $Notification->type = 'stock';
+        $Notification->itemid = $product->id;
+        $Notification->recipient = $shop->id;
+        $Notification->status = "unseen";
 
+        $Notification->save();
         return response()->json([
             'success' => true,
             'message' => 'Price Updated successfully.',
