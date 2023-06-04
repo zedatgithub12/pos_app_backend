@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ShopStatController;
 use Illuminate\Http\Request;
@@ -82,7 +83,10 @@ Route::delete('deleteuser/{id}', [AuthController::class, 'destroy']);
 Route::get('priceupdates/{id}', [PriceUpdateController::class, 'index']);
 Route::post('updateprice', [PriceUpdateController::class, 'store']);
 
-
+//notification routes
+Route::get('adminnotification', [NotificationController::class, 'index']);
+Route::get('salesnotification/{id}', [NotificationController::class, 'storeNotification']);
+Route::put('updatestatus/{id}', [NotificationController::class, 'updateStatus']);
 Route::get('images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
 

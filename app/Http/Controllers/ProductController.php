@@ -25,7 +25,7 @@ class ProductController extends Controller
      */public function storeproduct(string $name)
     {
 
-        $products = Product::where('shop', '=', $name)->get();
+        $products = Product::where('shop', '=', $name)->orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,

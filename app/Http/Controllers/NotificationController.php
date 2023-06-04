@@ -7,64 +7,38 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */public function index()
     {
-        $notifications = Notification::all();
+        $Notification = Notification::all();
 
-        return view('notifications.index', compact('notifications'));
+        return response()->json([
+            'success' => true,
+            'data' => $Notification
+        ], 200);
+
+    }
+    /**
+     * Display a listing of items in store
+     */public function storeNotification(string $id)
+    {
+
+        $Notification = Notification::where('recipient', '=', $id)->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $Notification
+        ], 200);
+
+    }
+    public function updateStatus(string $id)
+    {
+        $Notification = Notification::find($id);
+
+        $Notification->status = "seen";
+        $Notification->save();
     }
 
-    public function create()
-    {
-        return view('notifications.create');
-    }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required',
-            'time' => 'required',
-            'message' => 'required',
-            'type' => 'required',
-            'itemid' => 'required',
-            'recipient' => 'required',
-            'status' => 'required'
-        ]);
-
-        Notification::create($request->all());
-
-        return redirect()->route('notifications.index')
-            ->with('success', 'Notification created successfully.');
-    }
-
-    public function edit(Notification $notification)
-    {
-        return view('notifications.edit', compact('notification'));
-    }
-
-    public function update(Request $request, Notification $notification)
-    {
-        $request->validate([
-            'title' => 'required',
-            'time' => 'required',
-            'message' => 'required',
-            'type' => 'required',
-            'itemid' => 'required',
-            'recipient' => 'required',
-            'status' => 'required'
-        ]);
-
-        $notification->update($request->all());
-
-        return redirect()->route('notifications.index')
-            ->with('success', 'Notification updated successfully.');
-    }
-
-    public function destroy(Notification $notification)
-    {
-        $notification->delete();
-
-        return redirect()->route('notifications.index')
-            ->with('success', 'Notification deleted successfully.');
-    }
 }
