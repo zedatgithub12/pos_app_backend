@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +13,7 @@ class ShopStatController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
         $shopName = $request->input('shop');
-
+        $shop = Store::where('name', $shopName)->first();
         // If no preferences are specified, use the current month and year
         if (!$month) {
             $month = date('m');
@@ -24,7 +25,15 @@ class ShopStatController extends Controller
         // Get the current year and month
         $currentYear = date('Y');
         $currentMonth = date('m');
+        $currentDay = date('d');
 
+        // calculate daily sales for a give shop
+        $DailySales = DB::table('sales')
+            ->whereYear('date', $currentYear)
+            ->whereMonth('date', $currentMonth)
+            ->whereDay('date', $currentDay)
+            ->where('shop', $shopName)
+            ->count();
         // Calculate the monthly earnings and sales for the given shop
         $monthlyEarnings = DB::table('sales')
             ->whereYear('date', $currentYear)
@@ -49,6 +58,10 @@ class ShopStatController extends Controller
             ->where('shop', $shopName)
             ->count();
 
+        $todateSales = DB::table('sales')
+            ->where('shop', $shopName)
+            ->where('created_at', '>=', $shop->created_at)
+            ->count();
         // Get the total number of categories and customers for the given shop
         $totalProducts = DB::table('products')
             ->where('shop', $shopName)
@@ -64,8 +77,17 @@ class ShopStatController extends Controller
 
         $topProducts = DB::table('products')
             ->where('products.shop', $shopName)
+            ->where('products.status', 'In-stock')
             ->orderBy('quantity', 'desc')
-            ->take(12)
+            ->take(16)
+            ->get();
+
+
+        $lowProducts = DB::table('products')
+            ->where('products.shop', $shopName)
+            ->where('products.status', 'In-stock')
+            ->orderBy('quantity')
+            ->take(16)
             ->get();
 
         // Finally, display the results:
@@ -73,14 +95,17 @@ class ShopStatController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
+                'dailySales' => $DailySales,
                 'monthlyEarnings' => $monthlyEarnings,
                 'monthlySales' => $monthlySales,
                 'annualEarnings' => $annualEarnings,
                 'annualSales' => $annualSales,
+                'todatesales' => $todateSales,
                 'totalProducts' => $totalProducts,
                 'totalCategories' => $totalCategories,
                 'totalCustomers' => $totalCustomers,
-                'topProducts' => $topProducts
+                'topProducts' => $topProducts,
+                'lowProducts' => $lowProducts
             ]
         ], 200);
     }

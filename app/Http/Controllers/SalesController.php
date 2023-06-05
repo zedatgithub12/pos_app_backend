@@ -92,7 +92,7 @@ class SalesController extends Controller
                 $Notification->itemid = $product->id;
                 $Notification->recipient = $shop->id;
                 $Notification->status = "unseen";
-
+                $Notification->salesstatus = "unseen";
                 $Notification->save();
 
 

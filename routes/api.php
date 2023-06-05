@@ -87,6 +87,7 @@ Route::post('updateprice', [PriceUpdateController::class, 'store']);
 Route::get('adminnotification', [NotificationController::class, 'index']);
 Route::get('salesnotification/{id}', [NotificationController::class, 'storeNotification']);
 Route::put('updatestatus/{id}', [NotificationController::class, 'updateStatus']);
+Route::put('updatesalesstatus/{id}', [NotificationController::class, 'updateSalesStatus']);
 Route::get('images/{filename}', function ($filename) {
     $path = storage_path('app/public/' . $filename);
 

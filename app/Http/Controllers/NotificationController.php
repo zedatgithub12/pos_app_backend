@@ -40,5 +40,13 @@ class NotificationController extends Controller
         $Notification->save();
     }
 
+    public function updateSalesStatus(string $id)
+    {
+        $Notification = Notification::find($id);
+
+        $Notification->salesstatus = "seen";
+        $Notification->save();
+    }
+
 
 }

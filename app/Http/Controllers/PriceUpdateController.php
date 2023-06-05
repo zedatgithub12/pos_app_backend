@@ -68,11 +68,12 @@ class PriceUpdateController extends Controller
         $Notification = new Notification();
         $Notification->title = $product->name . " Price is Updated";
         $Notification->time = date('H:i:s');
-        $Notification->message = "price is changed from " . $request->from . " to " . $newPrice->to;
+        $Notification->message = "Changed from " . $request->from . " to " . $newPrice->to;
         $Notification->type = 'stock';
         $Notification->itemid = $product->id;
         $Notification->recipient = $shop->id;
         $Notification->status = "unseen";
+        $Notification->salesstatus = "unseen";
 
         $Notification->save();
         return response()->json([

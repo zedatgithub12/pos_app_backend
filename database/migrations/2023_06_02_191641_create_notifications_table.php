@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->integer('itemid');
             $table->integer('recipient');
             $table->string('status');
+            $table->string('salesstatus');
             $table->timestamps();
 
         });

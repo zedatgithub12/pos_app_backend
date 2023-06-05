@@ -15,6 +15,7 @@ class Notification extends Model
         'type',
         'itemid',
         'recipient',
-        'status'
+        'status',
+        'salesstatus'
     ];
 }
