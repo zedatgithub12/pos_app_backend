@@ -3,6 +3,7 @@
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PriceUpdateController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,7 @@ use App\Http\Controllers\AdminStatController;
 Route::post('/adduser', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('forgotpassword', [ForgotPasswordController::class, 'forgotpassword']);
+Route::post('resetpassword', [ResetPasswordController::class, 'resetpassword']);
 Route::put('changepass/{id}', [AuthController::class, 'changepass']);
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
