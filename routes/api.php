@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
@@ -55,6 +56,14 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::post('addproduct', [ProductController::class, 'store']);
 Route::post('updateproduct/{id}', [ProductController::class, 'update']);
 Route::delete('deleteproduct/{id}', [ProductController::class, 'destroy']);
+
+//packages routes
+Route::get('viewpackages', [PackageController::class, 'index']);
+Route::get('viewstorepackage/{name}', [PackageController::class, 'storepackages']);
+Route::get('/packages/{id}', [PackageController::class, 'show']);
+Route::post('addpackage', [PackageController::class, 'store']);
+Route::put('updatepackage/{id}', [PackageController::class, 'update']);
+Route::delete('deletepackage/{id}', [PackageController::class, 'destroy']);
 
 //Category routes
 Route::get('viewcategory', [CategoryController::class, 'index']);
