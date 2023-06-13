@@ -12,7 +12,7 @@ class PackageController extends Controller
      */
     public function index()
     {
-        $packages = Packages::all();
+        $packages = Packages::orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -77,50 +77,33 @@ class PackageController extends Controller
     {
         $packages = Packages::find($id);
 
+
+
+        if ($request->has('shopid')) {
+            $packages->shopid = $request->shopid;
+        }
+
+        if ($request->has('shopname')) {
+            $packages->shopname = $request->shopname;
+        }
+
+        if ($request->has('userid')) {
+            $packages->userid = $request->userid;
+        }
         if ($request->has('name')) {
             $packages->name = $request->name;
         }
-
-        if ($request->has('category')) {
-            $packages->category = $request->category;
-        }
-
-        if ($request->has('brand')) {
-            $packages->brand = $request->brand;
-        }
-
-        if ($request->has('code')) {
-            $packages->code = $request->code;
-        }
-
-        if ($request->has('cost')) {
-            $packages->cost = $request->cost;
-        }
-
-        if ($request->has('unit')) {
-            $packages->unit = $request->unit;
+        if ($request->has('items')) {
+            $packages->items = json_encode($request->items);
         }
 
         if ($request->has('price')) {
             $packages->price = $request->price;
         }
 
-        if ($request->has('quantity')) {
-            $packages->quantity = $request->quantity;
+        if ($request->has('expiredate')) {
+            $packages->expiredate = $request->expiredate;
         }
-
-        if ($request->has('description')) {
-            $packages->description = $request->description;
-        }
-
-        if ($request->has('shop')) {
-            $packages->shop = $request->shop;
-        }
-
-        if ($request->has('status')) {
-            $packages->status = $request->status;
-        }
-
 
         $packages->save();
 
@@ -132,6 +115,13 @@ class PackageController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $packages = Packages::find($id);
+        if (!$packages) {
+            return response()->json(['success' => false, 'message' => 'package not found'], 404);
+        }
+        $packages->delete();
+
+        return response()->json(['success' => true, 'message' => 'package deleted successfully']);
+
     }
 }

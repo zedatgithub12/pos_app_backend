@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->decimal('cost', 8, 2);
             $table->string('unit');
             $table->decimal('price', 8, 2);
+            $table->integer('min_quantity');
+            $table->integer('origional_quantity');
             $table->integer('quantity');
             $table->text('description')->nullable();
             $table->string('shop');

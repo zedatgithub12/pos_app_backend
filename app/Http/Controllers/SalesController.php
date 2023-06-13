@@ -17,7 +17,7 @@ class SalesController extends Controller
     public function index()
     {
 
-        $sales = Sale::all();
+        $sales = Sale::orderByDesc('id')->get();
         return response()->json([
             'success' => true,
             'message' => 'Sales retrieved successfully',

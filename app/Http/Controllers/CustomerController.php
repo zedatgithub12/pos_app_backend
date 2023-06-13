@@ -12,7 +12,7 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        $customers = Customer::all();
+        $customers = Customer::orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,

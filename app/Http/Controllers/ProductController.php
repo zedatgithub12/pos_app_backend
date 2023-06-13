@@ -12,7 +12,7 @@ class ProductController extends Controller
      * Display a listing of the resource.
      */public function index()
     {
-        $products = Product::all();
+        $products = Product::orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -69,6 +69,7 @@ class ProductController extends Controller
         $product->cost = $request->cost;
         $product->unit = $request->unit;
         $product->price = $request->price;
+        $product->origional_quantity = $request->quantity;
         $product->quantity = $request->quantity;
         $product->description = $request->description;
         $product->shop = $request->shop;

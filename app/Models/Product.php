@@ -17,6 +17,8 @@ class Product extends Model
         'cost',
         'unit',
         'price',
+        'min_quantity',
+        'origional_quantity',
         'quantity',
         'description',
         'shop',
