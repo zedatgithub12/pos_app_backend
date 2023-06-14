@@ -35,6 +35,10 @@ class StoreController extends Controller
         }
         $store = new Store();
         $store->name = $request->input('name');
+        $store->category = $request->input('category');
+        $store->region = $request->input('region');
+        $store->city = $request->input('city');
+        $store->subcity = $request->input('subcity');
         $store->address = $request->input('address');
         $store->description = $request->input('description');
         $store->phone = $request->input('phone');
