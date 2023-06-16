@@ -93,6 +93,8 @@ Route::delete('deleteuser/{id}', [AuthController::class, 'destroy']);
 //price update route
 Route::get('priceupdates/{id}', [PriceUpdateController::class, 'index']);
 Route::post('updateprice', [PriceUpdateController::class, 'store']);
+Route::post('updateallprice', [PriceUpdateController::class, 'updateallprice']);
+
 
 //notification routes
 Route::get('adminnotification', [NotificationController::class, 'index']);

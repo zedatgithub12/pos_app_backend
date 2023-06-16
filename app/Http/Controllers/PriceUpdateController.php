@@ -83,6 +83,62 @@ class PriceUpdateController extends Controller
         ], 201);
     }
 
+
+    public function updateallprice(Request $request)
+    {
+        $shop = Store::where('name', $request->name)->firstOrFail();
+        if (!$shop) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Can not find shop id.',
+                'data' => $shop
+            ], 402);
+        }
+        $newPrice = new PriceUpdates([
+            'productid' => $request->productid,
+            'shopid' => $shop->id,
+            'from' => $request->from,
+            'to' => $request->to,
+            'date' => date('Y-m-d'),
+            'status' => 'unseen',
+        ]);
+        $newPrice->save();
+
+        $product = Product::where('code', $request->productcode)->get();
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'can not update price.',
+
+            ], 402);
+        }
+
+        // Update the price for each product
+        foreach ($product as $stock) {
+            $stock->price = $newPrice->to;
+            $stock->save();
+
+            $shop = Store::where('name', $stock->shop)->first();
+            $Notification = new Notification();
+            $Notification->title = $stock->name . "Price is Updated";
+            $Notification->time = date('H:i:s');
+            $Notification->message = "Changed from " . $request->from . " to " . $newPrice->to;
+            $Notification->type = 'stock';
+            $Notification->itemid = $stock->id;
+            $Notification->recipient = $shop->id;
+            $Notification->status = "seen";
+            $Notification->salesstatus = "unseen";
+
+            $Notification->save();
+        }
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Price Updated successfully.',
+
+        ], 201);
+    }
     /**
      * Display the specified resource.
      */
