@@ -6,6 +6,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
+use App\Http\Controllers\SoldPackageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -64,6 +65,12 @@ Route::get('/packages/{id}', [PackageController::class, 'show']);
 Route::post('addpackage', [PackageController::class, 'store']);
 Route::put('updatepackage/{id}', [PackageController::class, 'update']);
 Route::delete('deletepackage/{id}', [PackageController::class, 'destroy']);
+
+//package sale routes 
+Route::get('viewsoldpackages', [SoldPackageController::class, 'index']);
+Route::post('createpackagesale', [SoldPackageController::class, 'store']);
+Route::get('viewstorepackagesale/{name}', [SoldPackageController::class, 'storepackagesale']);
+
 
 //Category routes
 Route::get('viewcategory', [CategoryController::class, 'index']);
