@@ -69,6 +69,7 @@ class ProductController extends Controller
         $product->cost = $request->cost;
         $product->unit = $request->unit;
         $product->price = $request->price;
+        $product->min_quantity = $request->min_quantity;
         $product->origional_quantity = $request->quantity;
         $product->quantity = $request->quantity;
         $product->description = $request->description;
