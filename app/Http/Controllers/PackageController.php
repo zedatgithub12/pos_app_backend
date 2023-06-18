@@ -20,11 +20,10 @@ class PackageController extends Controller
         ], 200);
     }
 
-    public function storepackage(string $name)
+    public function storepackages(string $id)
     {
 
-        $packages = Packages::where('shop', '=', $name)->orderByDesc('id')->get();
-
+        $packages = Packages::where('shopid', '=', $id)->orderByDesc('id')->get();
         return response()->json([
             'success' => true,
             'data' => $packages

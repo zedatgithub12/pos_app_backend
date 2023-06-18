@@ -26,7 +26,7 @@ class SoldPackageController extends Controller
 
     public function storepackagesale(string $name)
     {
-        $psold = SoldPackage::where('shop', '=', $name)->get();
+        $psold = SoldPackage::where('shop', '=', $name)->orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -117,14 +117,42 @@ class SoldPackageController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $sale = SoldPackage::findOrFail($id);
+        $sale->user = $request->user;
+        $sale->shop = $request->shop;
+        $sale->customer = $request->customer;
+        // $sale->items = json_encode($request->items);
+        $sale->tax = $request->tax;
+        $sale->discount = $request->discount;
+        $sale->grandtotal = $request->grandTotal;
+        $sale->payment_status = $request->payment_status;
+        $sale->payment_method = $request->payment_method;
+        $sale->note = $request->note;
+
+        if ($sale->save()) {
+            return response()->json(['success' => true, 'message' => 'Package Sale updated successfully']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unable to update sale, retry later']);
+        }
+
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $packagesale = SoldPackage::find($id);
+        if (!$packagesale) {
+            return response()->json(['success' => false, 'message' => 'Record not found'], 404);
+        }
+        if ($packagesale->delete()) {
+            return response()->json(['success' => true, 'message' => 'Deleted successfully']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unable to delete this record']);
+        }
+
+
     }
 }

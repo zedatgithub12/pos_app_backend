@@ -95,6 +95,7 @@ class ShopStatController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
+                'shopInfo' => $shop,
                 'dailySales' => $DailySales,
                 'monthlyEarnings' => $monthlyEarnings,
                 'monthlySales' => $monthlySales,

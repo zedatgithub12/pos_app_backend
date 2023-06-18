@@ -29,7 +29,7 @@ class SalesController extends Controller
      */
     public function storesale(string $name)
     {
-        $sales = Sale::where('shop', '=', $name)->get();
+        $sales = Sale::where('shop', '=', $name)->orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -101,12 +101,6 @@ class SalesController extends Controller
         }
 
         $sale->save();
-
-        // foreach ($sale->products as $product_sold) {
-        //     $product = Product::find($product_sold['id']);
-        //     $product->quantity -= $product_sold['quantity'];
-        //     $product->save();
-        // }
         return response()->json(['success' => true, 'message' => 'Sale created successfully', 'reference_number' => $referenceNumber]);
     }
 
@@ -129,7 +123,7 @@ class SalesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, string $id)
     {
         $sale = Sale::findOrFail($id);
         $sale->user = $request->user;
