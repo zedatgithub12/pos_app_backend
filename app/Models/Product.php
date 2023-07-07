@@ -12,6 +12,7 @@ class Product extends Model
         'picture',
         'name',
         'category',
+        'sub_category',
         'brand',
         'code',
         'cost',

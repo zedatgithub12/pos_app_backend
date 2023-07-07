@@ -33,13 +33,6 @@ class ProductController extends Controller
         ], 200);
 
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -64,6 +57,7 @@ class ProductController extends Controller
         $product = new Product();
         $product->name = $request->name;
         $product->category = $request->category;
+        $product->sub_category = $request->sub_category;
         $product->brand = $request->brand;
         $product->code = $request->code;
         $product->cost = $request->cost;
@@ -147,6 +141,9 @@ class ProductController extends Controller
             $product->category = $request->category;
         }
 
+        if ($request->has('sub_category')) {
+            $product->sub_category = $request->sub_category;
+        }
         if ($request->has('brand')) {
             $product->brand = $request->brand;
         }
@@ -171,6 +168,9 @@ class ProductController extends Controller
             $product->quantity = $request->quantity;
         }
 
+        if ($request->has('min_quantity')) {
+            $product->min_quantity = $request->min_quantity;
+        }
         if ($request->has('description')) {
             $product->description = $request->description;
         }

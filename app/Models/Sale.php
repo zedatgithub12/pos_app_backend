@@ -15,8 +15,6 @@ class Sale extends Model
         'shop',
         'customer',
         'items',
-        'tax',
-        'discount',
         'payment_status',
         'payment_method',
         'note',

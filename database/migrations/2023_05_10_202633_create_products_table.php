@@ -15,12 +15,13 @@ return new class extends Migration {
             $table->string('picture');
             $table->string('name');
             $table->string('category');
+            $table->string('sub_category')->nullable();
             $table->string('brand')->nullable();
             $table->string('code');
             $table->decimal('cost', 8, 2);
             $table->string('unit');
             $table->decimal('price', 8, 2);
-            $table->integer('min_quantity');
+            $table->integer('min_quantity')->nullable();
             $table->integer('origional_quantity');
             $table->integer('quantity');
             $table->text('description')->nullable();

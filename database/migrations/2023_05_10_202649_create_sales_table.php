@@ -17,8 +17,6 @@ return new class extends Migration {
             $table->string('shop');
             $table->string('customer');
             $table->json('items');
-            $table->decimal('tax', 8, 2);
-            $table->decimal('discount', 8, 2);
             $table->string('payment_status');
             $table->string('payment_method');
             $table->text('note')->nullable();

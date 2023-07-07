@@ -62,8 +62,6 @@ class SalesController extends Controller
         $sale->shop = $request->shop;
         $sale->customer = $request->customer;
         $sale->items = json_encode($request->products);
-        $sale->tax = $request->tax;
-        $sale->discount = $request->discount;
         $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;
@@ -104,21 +102,6 @@ class SalesController extends Controller
         return response()->json(['success' => true, 'message' => 'Sale created successfully', 'reference_number' => $referenceNumber]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -130,8 +113,6 @@ class SalesController extends Controller
         $sale->shop = $request->shop;
         $sale->customer = $request->customer;
         $sale->items = json_encode($request->products);
-        $sale->tax = $request->tax;
-        $sale->discount = $request->discount;
         $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;

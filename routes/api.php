@@ -6,7 +6,9 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
+use App\Http\Controllers\ShopTargetController;
 use App\Http\Controllers\SoldPackageController;
+use App\Http\Controllers\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -80,12 +82,26 @@ Route::post('addcategory', [CategoryController::class, 'store']);
 Route::post('editcategory/{id}', [CategoryController::class, 'update']);
 Route::delete('deletecategory/{id}', [CategoryController::class, 'destroy']);
 
+//Sub Categories routes
+Route::get('viewsubcategory', [SubCategoryController::class, 'index']);
+Route::post('addsubcategory', [SubCategoryController::class, 'store']);
+Route::post('editsubcategory/{id}', [SubCategoryController::class, 'update']);
+Route::delete('deletesubcategory/{id}', [SubCategoryController::class, 'destroy']);
+
 // Sales routes
 Route::get('viewsale', [SalesController::class, 'index']);
 Route::get('viewstoresale/{name}', [SalesController::class, 'storesale']);
 Route::post('createsale', [SalesController::class, 'store']);
 Route::post('updatesale/{id}', [SalesController::class, 'update']);
 Route::delete('deletesale/{id}', [SalesController::class, 'destroy']);
+
+//targets
+Route::get('targets', [ShopTargetController::class, 'index']);
+Route::get('singleshop/{id}', [ShopTargetController::class, 'show']);
+Route::post('addtarget', [ShopTargetController::class, 'store']);
+Route::post('updatetarget/{id}', [ShopTargetController::class, 'update']);
+Route::delete('deletetarget/{id}', [ShopTargetController::class, 'destroy']);
+
 // Customers routes
 Route::get('viewcustomer', [CustomerController::class, 'index']);
 Route::get('viewstorecustomer/{name}', [CustomerController::class, 'storecustomer']);
