@@ -9,5 +9,5 @@ class ShopTarget extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["shopid","shopname","s_daily", "r_daily","s_monthly","r_monthly","s_yearly","r_yearly","start_date","end_date","status"];
+    protected $fillable = ["userid", "shopid", "shopname", "s_daily", "r_daily", "s_monthly", "r_monthly", "s_yearly", "r_yearly", "start_date", "end_date", "status"];
 }

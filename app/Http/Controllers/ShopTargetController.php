@@ -12,7 +12,7 @@ class ShopTargetController extends Controller
      */
     public function index()
     {
-        $targets = ShopTarget::orderByDesc('id')->get();
+        $targets = ShopTarget::where("status", "active")->orderByDesc('id')->get();
 
         return response()->json([
             'success' => true,
@@ -26,6 +26,7 @@ class ShopTargetController extends Controller
     public function store(Request $request)
     {
         $shopTarget = new ShopTarget();
+        $shopTarget->userid = $request->userid;
         $shopTarget->shopid = $request->shopid;
         $shopTarget->shopname = $request->shopname;
         $shopTarget->s_daily = $request->s_daily;

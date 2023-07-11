@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,17 +12,18 @@ return new class extends Migration
     {
         Schema::create('shop_targets', function (Blueprint $table) {
             $table->id();
+            $table->integer("userid");
             $table->integer("shopid");
             $table->string("shopname");
-            $table->integer("s_daily");
+            $table->integer("s_daily")->nullable();
             $table->integer("r_daily");
-            $table->integer("s_monthly");
+            $table->integer("s_monthly")->nullable();
             $table->integer("r_monthly");
-            $table->integer("s_yearly");
+            $table->integer("s_yearly")->nullable();
             $table->integer("r_yearly");
             $table->date("start_date");
             $table->date("end_date");
-            $table->enum('status', ['active', 'inactive']);
+            $table->enum('status', ['active', 'archived']);
             $table->timestamps();
         });
     }
