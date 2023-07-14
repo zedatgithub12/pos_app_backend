@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Replanish;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
@@ -91,6 +92,7 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::findOrFail($id);
+        $Stock = Replanish::where('stock_id', $id)->orderByDesc('id')->get();
         $items = Product::where('code', $product->code)
             ->where('status', 'In-stock')
             ->get();
@@ -98,6 +100,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'product' => $product,
+            'replanishments' => $Stock,
             'items' => $items,
         ]);
     }

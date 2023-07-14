@@ -4,6 +4,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PriceUpdateController;
+use App\Http\Controllers\ReplanishController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
 use App\Http\Controllers\ShopTargetController;
@@ -118,6 +119,12 @@ Route::delete('deleteuser/{id}', [AuthController::class, 'destroy']);
 Route::get('priceupdates/{id}', [PriceUpdateController::class, 'index']);
 Route::post('updateprice', [PriceUpdateController::class, 'store']);
 Route::post('updateallprice', [PriceUpdateController::class, 'updateallprice']);
+
+//Replanishing route
+Route::get('allreplanishments', [ReplanishController::class, 'index']);
+Route::get('singlereplanishment/{id}', [ReplanishController::class, 'show']);
+Route::post('newreplanishment', [ReplanishController::class, 'store']);
+Route::delete('deleterecord/{id}', [ReplanishController::class, 'destroy']);
 
 
 //notification routes
