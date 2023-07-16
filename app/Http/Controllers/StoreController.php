@@ -40,6 +40,8 @@ class StoreController extends Controller
         $store->city = $request->input('city');
         $store->subcity = $request->input('subcity');
         $store->address = $request->input('address');
+        $store->latitude = $request->input('latitude');
+        $store->longitude = $request->input('longitude');
         $store->description = $request->input('description');
         $store->phone = $request->input('phone');
         $store->status = '0';
@@ -80,7 +82,13 @@ class StoreController extends Controller
         $store->name = $request->input('name');
         $store->manager_id = $request->input('manager_id');
         $store->manager = $request->input('manager');
+        $store->category = $request->input('category');
+        $store->region = $request->input('region');
+        $store->city = $request->input('city');
+        $store->subcity = $request->input('subcity');
         $store->address = $request->input('address');
+        $store->latitude = $request->input('latitude');
+        $store->longitude = $request->input('longitude');
         $store->description = $request->input('description');
         $store->phone = $request->input('phone');
 

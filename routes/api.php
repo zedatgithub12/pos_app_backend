@@ -9,6 +9,7 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
 use App\Http\Controllers\ShopTargetController;
 use App\Http\Controllers\SoldPackageController;
+use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -125,6 +126,13 @@ Route::get('allreplanishments', [ReplanishController::class, 'index']);
 Route::get('singlereplanishment/{id}', [ReplanishController::class, 'show']);
 Route::post('newreplanishment', [ReplanishController::class, 'store']);
 Route::delete('deleterecord/{id}', [ReplanishController::class, 'destroy']);
+
+
+//Trafer routes
+Route::get('alltransfers', [StockTransferController::class, 'index']);
+Route::post('transfer', [StockTransferController::class, 'transferItems']);
+Route::post('updatetransfer/{id}', [StockTransferController::class, 'update']);
+Route::delete('deletetransfer/{id}', [StockTransferController::class, 'destroy']);
 
 
 //notification routes

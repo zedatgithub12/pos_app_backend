@@ -117,10 +117,14 @@ class SalesController extends Controller
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;
         $sale->note = $request->note;
+        if ($sale->save()) {
+            return response()->json(['success' => true, 'message' => 'Sale updated successfully']);
 
-        $sale->save();
+        } else {
+            return response()->json(['success' => false, 'message' => 'Cannot update sale']);
 
-        return response()->json(['success' => true, 'message' => 'Sale updated successfully']);
+        }
+
     }
 
     /**

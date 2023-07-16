@@ -15,6 +15,8 @@ class Store extends Model
         'city',
         'subcity',
         'address',
+        'latitude',
+        'longitude',
         'phone',
         'description',
         'profile_image',
