@@ -15,14 +15,11 @@ return new class extends Migration {
             $table->integer("userid");
             $table->integer("shopid");
             $table->string("shopname");
-            $table->integer("s_daily")->nullable();
             $table->integer("r_daily");
-            $table->integer("s_monthly")->nullable();
             $table->integer("r_monthly");
-            $table->integer("s_yearly")->nullable();
             $table->integer("r_yearly");
-            $table->date("start_date");
-            $table->date("end_date");
+            $table->date("start_date")->nullable();
+            $table->date("end_date")->nullable();
             $table->enum('status', ['active', 'archived']);
             $table->timestamps();
         });

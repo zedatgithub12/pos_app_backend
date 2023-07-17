@@ -25,26 +25,52 @@ class ShopTargetController extends Controller
      */
     public function store(Request $request)
     {
-        $shopTarget = new ShopTarget();
-        $shopTarget->userid = $request->userid;
-        $shopTarget->shopid = $request->shopid;
-        $shopTarget->shopname = $request->shopname;
-        $shopTarget->s_daily = $request->s_daily;
-        $shopTarget->r_daily = $request->r_daily;
-        $shopTarget->s_monthly = $request->s_monthly;
-        $shopTarget->r_monthly = $request->r_monthly;
-        $shopTarget->s_yearly = $request->s_yearly;
-        $shopTarget->r_yearly = $request->r_yearly;
-        $shopTarget->start_date = $request->start_date;
-        $shopTarget->end_date = $request->end_date;
-        $shopTarget->status = $request->status;
-        if ($shopTarget->save()) {
-            return response()->json(['success' => true, 'message' => 'Added successfully'], 200);
+
+        $exist = ShopTarget::where("shopid", $request->shopid)->where("status", "active")->exists();
+        if ($exist) {
+
+            $targets = ShopTarget::where("shopid", $request->shopid)->where("status", "active")->first();
+            $targets->status = 'archived';
+
+            if ($targets->save()) {
+                $shopTarget = new ShopTarget();
+                $shopTarget->userid = $request->userid;
+                $shopTarget->shopid = $request->shopid;
+                $shopTarget->shopname = $request->shopname;
+                $shopTarget->r_daily = $request->r_daily;
+                $shopTarget->r_monthly = $request->r_monthly;
+                $shopTarget->r_yearly = $request->r_yearly;
+                $shopTarget->start_date = $request->start_date;
+                $shopTarget->end_date = $request->end_date;
+                $shopTarget->status = 'active';
+                if ($shopTarget->save()) {
+                    return response()->json(['success' => true, 'message' => 'Target added successfully'], 200);
+                } else {
+
+                    return response()->json(['success' => false, 'message' => 'Unable to add target'], 500);
+                }
+            } else {
+                return response()->json(['success' => false, 'message' => 'Unable to add target'], 500);
+            }
+
         } else {
+            $shopTarget = new ShopTarget();
+            $shopTarget->userid = $request->userid;
+            $shopTarget->shopid = $request->shopid;
+            $shopTarget->shopname = $request->shopname;
+            $shopTarget->r_daily = $request->r_daily;
+            $shopTarget->r_monthly = $request->r_monthly;
+            $shopTarget->r_yearly = $request->r_yearly;
+            $shopTarget->start_date = $request->start_date;
+            $shopTarget->end_date = $request->end_date;
+            $shopTarget->status = "active";
+            if ($shopTarget->save()) {
+                return response()->json(['success' => true, 'message' => 'Target added successfully'], 200);
+            } else {
 
-            return response()->json(['success' => false, 'message' => 'Unable to add target'], 500);
+                return response()->json(['success' => false, 'message' => 'Unable to add target'], 500);
+            }
         }
-
     }
 
     /**
@@ -65,11 +91,8 @@ class ShopTargetController extends Controller
         $shopTarget = ShopTarget::findOrFail($id);
         $shopTarget->shopid = $request->shopid;
         $shopTarget->shopname = $request->shopname;
-        $shopTarget->s_daily = $request->s_daily;
         $shopTarget->r_daily = $request->r_daily;
-        $shopTarget->s_monthly = $request->s_monthly;
         $shopTarget->r_monthly = $request->r_monthly;
-        $shopTarget->s_yearly = $request->s_yearly;
         $shopTarget->r_yearly = $request->r_yearly;
         $shopTarget->start_date = $request->start_date;
         $shopTarget->end_date = $request->end_date;
