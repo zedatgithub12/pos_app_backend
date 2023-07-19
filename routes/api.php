@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
@@ -44,6 +45,13 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+
+//admin dashboard api routes
+Route::get('againsttarget/{name}', [DashboardController::class, 'getSalesAgainstTarget']);
+Route::get('lowstock/{name}', [DashboardController::class, 'getProductsByShopAndQuantity']);
+Route::get('customercount', [DashboardController::class, 'totalCustomers']);
+
+
 //get statistics
 Route::get('adminstat', [AdminStatController::class, 'Stats']);
 Route::get('shopstat', [ShopStatController::class, 'Stats']);
@@ -86,6 +94,7 @@ Route::delete('deletecategory/{id}', [CategoryController::class, 'destroy']);
 
 //Sub Categories routes
 Route::get('viewsubcategory', [SubCategoryController::class, 'index']);
+Route::get('subcategory/{name}', [SubCategoryController::class, 'show']);
 Route::post('addsubcategory', [SubCategoryController::class, 'store']);
 Route::post('editsubcategory/{id}', [SubCategoryController::class, 'update']);
 Route::delete('deletesubcategory/{id}', [SubCategoryController::class, 'destroy']);

@@ -20,6 +20,16 @@ class SubCategoryController extends Controller
         ], 200);
     }
 
+    public function show(string $name)
+    {
+
+        $subcat = SubCategory::where('main_category', $name)->orderByDesc('id')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $subcat
+        ]);
+    }
 
 
     /**
