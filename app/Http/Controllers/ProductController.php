@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PriceUpdates;
 use App\Models\Replanish;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -93,7 +94,8 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $Stock = Replanish::where('stock_id', $id)->orderByDesc('id')->get();
-        $items = Product::where('code', $product->code)
+        $updates = PriceUpdates::where('productid', $id)->orderByDesc('id')->get();
+        $Availability = Product::where('code', $product->code)
             ->where('status', 'In-stock')
             ->get();
 
@@ -101,7 +103,8 @@ class ProductController extends Controller
             'success' => true,
             'product' => $product,
             'replanishments' => $Stock,
-            'items' => $items,
+            'priceupdates' => $updates,
+            'items' => $Availability,
         ]);
     }
 

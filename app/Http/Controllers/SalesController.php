@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\sold_item;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Models\Sale;
@@ -71,14 +72,18 @@ class SalesController extends Controller
         $sale->time = date('H:i:s');
 
 
+
+        $soldItems = [];
         $items = json_decode($sale->items, true);
         foreach ($items as $item) {
+
             $product = Product::find($item['id']);
             $newQuantity = $product->quantity - $item['quantity'];
-            if ($newQuantity < 0) {
+            if ($newQuantity <= 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);
             }
             $product->quantity = $newQuantity;
+
             if ($newQuantity == 0) {
                 $product->status = 'out-stock';
                 $shop = Store::where('name', $product->shop)->first();
@@ -96,9 +101,21 @@ class SalesController extends Controller
 
             }
             $product->save();
-        }
+            $sale->save();
 
-        $sale->save();
+
+            $soldItems[] = [
+                'sale_id' => $sale->id,
+                'product_id' => $item['id'],
+                'quantity' => $item['quantity'],
+                'price' => $item['subtotal'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+        sold_item::insert($soldItems);
+
+
         return response()->json(['success' => true, 'message' => 'Sale created successfully', 'reference_number' => $referenceNumber]);
     }
 

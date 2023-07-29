@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\Product;
 use App\Models\StockTransfer;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class StockTransferController extends Controller
                 $this->deductQuantityFromShop($senderShopName, $code, $quantity);
 
                 // Add the quantity to receiver shop
-                $this->addQuantityToShop($receiverShopName, $code, $quantity);
+                $this->addQuantityToShop($senderShopName, $receiverShopName, $code, $quantity);
             } else {
                 // Quantity to be transferred is more than available quantity in sender shop
                 $message[] = "Insufficient quantity for item with code: $code";
@@ -60,6 +61,19 @@ class StockTransferController extends Controller
         $transfer->status = count($message) > 0 ? 'partially' : 'done';
 
         if ($transfer->save()) {
+
+            $Notification = new Notification();
+            $Notification->title = "Stocks Transfer";
+            $Notification->time = date('H:i:s');
+            $Notification->message = "Stocks are transferred from" . $request->sendershopname . " to " . $request->receivershopname;
+            $Notification->type = 'transfer';
+            $Notification->itemid = $transfer->id;
+            $Notification->recipient = $receiverShopId;
+            $Notification->status = "unseen";
+            $Notification->salesstatus = "unseen";
+
+            $Notification->save();
+
             return response()->json(['success' => true, 'message' => 'Items transfer is done!', 'data' => $items], 200);
         } else {
             return response()->json(['success' => false, 'message' => 'Items transfer is failed!', 'data' => $items], 500);
@@ -84,7 +98,7 @@ class StockTransferController extends Controller
         $product->save();
     }
 
-    private function addQuantityToShop($shop, $code, $quantity)
+    private function addQuantityToShop($senderShopName, $shop, $code, $quantity)
     {
         $product = Product::where('shop', $shop)->where('code', $code)->first();
 
@@ -95,7 +109,26 @@ class StockTransferController extends Controller
             // Handle the case where the product is not found
             // For example, you can log an error or throw an exception
             // You can also add a message to the $message array to indicate the issue
-            $message[] = "Item with code: $code not found in the shop: $shop";
+
+            $ItemInShop = Product::where('shop', $senderShopName)->where('code', $code)->first();
+
+            $product = new Product();
+            $product->picture = $ItemInShop->picture;
+            $product->name = $ItemInShop->name;
+            $product->category = $ItemInShop->category;
+            $product->sub_category = $ItemInShop->sub_category;
+            $product->brand = $ItemInShop->brand;
+            $product->code = $code;
+            $product->cost = $ItemInShop->cost;
+            $product->unit = $ItemInShop->unit;
+            $product->price = $ItemInShop->price;
+            $product->min_quantity = $quantity;
+            $product->origional_quantity = $quantity;
+            $product->quantity = $quantity;
+            $product->description = $ItemInShop->description;
+            $product->shop = $shop;
+            $product->status = $ItemInShop->status;
+            $product->save();
         }
     }
 
