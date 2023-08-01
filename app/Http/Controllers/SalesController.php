@@ -15,10 +15,12 @@ class SalesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function getSales(Request $request)
     {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
 
-        $sales = Sale::orderByDesc('id')->get();
+        $sales = Sale::orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
         return response()->json([
             'success' => true,
             'message' => 'Sales retrieved successfully',
@@ -28,9 +30,12 @@ class SalesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function storesale(string $name)
+    public function storesale(Request $request, string $name)
     {
-        $sales = Sale::where('shop', '=', $name)->orderByDesc('id')->get();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+
+        $sales = Sale::where('shop', '=', $name)->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,

@@ -79,7 +79,7 @@ Route::put('updatepackage/{id}', [PackageController::class, 'update']);
 Route::delete('deletepackage/{id}', [PackageController::class, 'destroy']);
 
 //package sale routes 
-Route::get('viewsoldpackages', [SoldPackageController::class, 'index']);
+Route::get('viewsoldpackages', [SoldPackageController::class, 'getPackages']);
 Route::post('createpackagesale', [SoldPackageController::class, 'store']);
 Route::get('viewstorepackagesale/{name}', [SoldPackageController::class, 'storepackagesale']);
 Route::post('updatepackagesale/{id}', [SoldPackageController::class, 'update']);
@@ -100,7 +100,7 @@ Route::post('editsubcategory/{id}', [SubCategoryController::class, 'update']);
 Route::delete('deletesubcategory/{id}', [SubCategoryController::class, 'destroy']);
 
 // Sales routes
-Route::get('viewsale', [SalesController::class, 'index']);
+Route::get('viewsale', [SalesController::class, 'getSales']);
 Route::get('viewstoresale/{name}', [SalesController::class, 'storesale']);
 Route::post('createsale', [SalesController::class, 'store']);
 Route::post('updatesale/{id}', [SalesController::class, 'update']);

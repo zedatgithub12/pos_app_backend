@@ -13,28 +13,33 @@ class SoldPackageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function getPackages(Request $request)
     {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
 
-        $psales = SoldPackage::orderByDesc('id')->get();
+        $packages = SoldPackage::orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+
         return response()->json([
             'success' => true,
-            'message' => 'Sold package retrieved successfully',
-            'data' => $psales
+            'data' => $packages
         ], 200);
     }
 
-    public function storepackagesale(string $name)
+    public function storepackagesale(Request $request, string $name)
     {
-        $psold = SoldPackage::where('shop', '=', $name)->orderByDesc('id')->get();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+
+        $psold = SoldPackage::where('shop', $name)
+            ->orderByDesc('id')
+            ->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,
-            'message' => 'Sold package retrieved successfully',
+            'message' => 'Sold packages retrieved successfully',
             'data' => $psold
         ], 200);
-
-
     }
 
     /**
