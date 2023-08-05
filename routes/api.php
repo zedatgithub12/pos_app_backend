@@ -50,7 +50,7 @@ Route::middleware('auth:api')->group(function () {
 Route::get('againsttarget/{name}', [DashboardController::class, 'getSalesAgainstTarget']);
 Route::get('lowstock/{name}', [DashboardController::class, 'getProductsByShopAndQuantity']);
 Route::get('customercount', [DashboardController::class, 'totalCustomers']);
-
+Route::get('monthlytarget/{month}', [DashboardController::class, 'getMonthlyTargets']);
 
 //get statistics
 Route::get('adminstat', [AdminStatController::class, 'Stats']);

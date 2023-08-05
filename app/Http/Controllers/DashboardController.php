@@ -36,6 +36,42 @@ class DashboardController extends Controller
 
         return $salesArray;
     }
+
+    public function getMonthlyTargets(string $month, Request $request)
+    {
+        $shop = $request->query("shop");
+
+        // Convert month name to Carbon instance
+        $carbonMonth = Carbon::parse($month);
+
+        // Get the start and end dates of the month
+        $startDate = $carbonMonth->startOfMonth()->format('Y-m-d');
+        $endDate = $carbonMonth->endOfMonth()->format('Y-m-d');
+
+        $sales = DB::table('sales')
+            ->select(DB::raw("DATE(created_at) as date"), DB::raw("SUM(grandtotal) as totalRevenue"))
+            ->where('shop', $shop)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $salesArray = [];
+
+        foreach ($sales as $sale) {
+            $salesArray[] = [
+                'date' => $sale->date,
+                'totalRevenue' => $sale->totalRevenue,
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'monthly sales retrieved successfully',
+            'data' => $salesArray,
+
+        ], 200);
+    }
     public function getDailyRevenue($shop)
     {
         $startDate = Carbon::today();

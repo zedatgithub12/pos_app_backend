@@ -12,9 +12,11 @@ class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
-     */public function index()
+     */public function index(Request $request)
     {
-        $products = Product::orderByDesc('id')->get();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+        $products = Product::orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,
@@ -24,10 +26,11 @@ class ProductController extends Controller
     }
     /**
      * Display a listing of items in store
-     */public function storeproduct(string $name)
+     */public function storeproduct(Request $request, string $name)
     {
-
-        $products = Product::where('shop', '=', $name)->orderByDesc('id')->get();
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+        $products = Product::where('shop', '=', $name)->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,
@@ -93,10 +96,13 @@ class ProductController extends Controller
     public function show(string $id)
     {
         $product = Product::findOrFail($id);
-        $Stock = Replanish::where('stock_id', $id)->orderByDesc('id')->get();
-        $updates = PriceUpdates::where('productid', $id)->orderByDesc('id')->get();
+        $Stock = Replanish::where('stock_id', $id)->orderByDesc('id')->take(20)
+            ->get();
+        $updates = PriceUpdates::where('productid', $id)->orderByDesc('id')->take(20)
+            ->get();
         $Availability = Product::where('code', $product->code)
             ->where('status', 'In-stock')
+            ->take(20)
             ->get();
 
         return response()->json([
