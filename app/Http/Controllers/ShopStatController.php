@@ -13,7 +13,11 @@ class ShopStatController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
         $shopName = $request->input('shop');
-        $shop = Store::where('name', $shopName)->first();
+        $shop = Store::where('name', $shopName)
+        ->leftJoin('shop_statuses', 'stores.id', '=', 'shop_statuses.shop_id')
+        ->select('stores.*', 'shop_statuses.status as last_status')
+        ->orderBy('shop_statuses.id', 'desc')
+        ->first();
         // If no preferences are specified, use the current month and year
         if (!$month) {
             $month = date('m');

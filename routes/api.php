@@ -8,6 +8,7 @@ use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ReplanishController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
+use App\Http\Controllers\ShopStatusController;
 use App\Http\Controllers\ShopTargetController;
 use App\Http\Controllers\SoldPackageController;
 use App\Http\Controllers\StockTransferController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\SubCategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ItemController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CategoryController;
@@ -62,6 +65,25 @@ Route::post('createstore', [StoreController::class, 'store']);
 Route::post('updatestore/{id}', [StoreController::class, 'update']);
 Route::delete('deletestore/{id}', [StoreController::class, 'destroy']);
 Route::post('addmanager/{id}', [StoreController::class, 'addmanager']);
+
+//store status changing routes
+Route::post("changeStatus", [ShopStatusController::class, 'store']);
+Route::post("updateStatus", [ShopStatusController::class, 'update']);
+
+// items route
+Route::get('/items', [ItemController::class, 'index']);
+Route::post('/items', [ItemController::class, 'store']);
+Route::get('/items/{id}', [ItemController::class, 'show']);
+Route::put('/items/{id}', [ItemController::class, 'update']);
+Route::delete('/items/{id}', [ItemController::class, 'destroy']);
+
+// stock routes
+Route::get('/stocks', [StockController::class, 'index']);
+Route::post('/stocks', [StockController::class, 'store']);
+Route::get('/stocks/{id}', [StockController::class, 'show']);
+Route::put('/stocks/{id}', [StockController::class, 'update']);
+Route::delete('/stocks/{id}', [StockController::class, 'destroy']);
+
 //product routes
 Route::get('viewproduct', [ProductController::class, 'index']);
 Route::get('viewstoreproduct/{name}', [ProductController::class, 'storeproduct']);

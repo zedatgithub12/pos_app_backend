@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('city')->nullable();
             $table->string('subcity')->nullable();
             $table->string('address');
+            $table->string('tin_number')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->string('phone');

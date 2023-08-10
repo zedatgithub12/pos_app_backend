@@ -15,7 +15,13 @@ class StoreController extends Controller
      */
     public function index()
     {
-        $stores = Store::all();
+        $stores = Store::select('stores.*', 'shop_statuses.status as last_status')
+            ->leftJoin('shop_statuses', function ($join) {
+                $join->on('stores.id', '=', 'shop_statuses.shop_id')
+                    ->whereRaw('shop_statuses.id = (select max(id) from shop_statuses where shop_statuses.shop_id = stores.id)');
+            })
+            ->get();
+
         return response()->json([
             'success' => true,
             'data' => $stores
@@ -40,6 +46,7 @@ class StoreController extends Controller
         $store->city = $request->input('city');
         $store->subcity = $request->input('subcity');
         $store->address = $request->input('address');
+        $store->tin_number = $request->input('tin_number');
         $store->latitude = $request->input('latitude');
         $store->longitude = $request->input('longitude');
         $store->description = $request->input('description');
@@ -87,6 +94,7 @@ class StoreController extends Controller
         $store->city = $request->input('city');
         $store->subcity = $request->input('subcity');
         $store->address = $request->input('address');
+        $store->tin_number = $request->input('tin_number');
         $store->latitude = $request->input('latitude');
         $store->longitude = $request->input('longitude');
         $store->description = $request->input('description');

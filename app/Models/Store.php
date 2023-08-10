@@ -15,6 +15,7 @@ class Store extends Model
         'city',
         'subcity',
         'address',
+        'tin_number',
         'latitude',
         'longitude',
         'phone',
