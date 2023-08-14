@@ -100,7 +100,7 @@ class ProductController extends Controller
             ->get();
         $updates = PriceUpdates::where('productid', $id)->orderByDesc('id')->take(20)
             ->get();
-        $Availability = Product::where('code', $product->code)
+        $Availability = Stock::where('code', $product->code)
             ->where('status', 'In-stock')
             ->take(20)
             ->get();
@@ -128,20 +128,6 @@ class ProductController extends Controller
     public function update(Request $request, string $id)
     {
 
-        // $request->validate([
-        //     'picture' => 'nullable|image',
-        //     'name' => 'nullable|string',
-        //     'category' => 'nullable|string',
-        //     'brand' => 'nullable|string',
-        //     'code' => 'nullable|string',
-        //     'cost' => 'nullable|numeric',
-        //     'unit' => 'nullable|string',
-        //     'price' => 'nullable|numeric',
-        //     'quantity' => 'nullable|numeric',
-        //     'description' => 'nullable|string',
-        //     'shop' => 'nullable|string',
-        //     'status' => 'nullable|string',
-        // ]);
 
         $product = Product::find($id);
 

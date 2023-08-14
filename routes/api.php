@@ -71,18 +71,20 @@ Route::post("changeStatus", [ShopStatusController::class, 'store']);
 Route::post("updateStatus", [ShopStatusController::class, 'update']);
 
 // items route
-Route::get('/items', [ItemController::class, 'index']);
-Route::post('/items', [ItemController::class, 'store']);
-Route::get('/items/{id}', [ItemController::class, 'show']);
-Route::put('/items/{id}', [ItemController::class, 'update']);
-Route::delete('/items/{id}', [ItemController::class, 'destroy']);
+Route::get('items', [ItemController::class, 'index']);
+Route::post('add-items', [ItemController::class, 'store']);
+Route::get('get-items/{id}', [ItemController::class, 'show']);
+Route::post('update-items/{id}', [ItemController::class, 'update']);
+Route::delete('delete-items/{id}', [ItemController::class, 'destroy']);
 
 // stock routes
-Route::get('/stocks', [StockController::class, 'index']);
-Route::post('/stocks', [StockController::class, 'store']);
-Route::get('/stocks/{id}', [StockController::class, 'show']);
-Route::put('/stocks/{id}', [StockController::class, 'update']);
-Route::delete('/stocks/{id}', [StockController::class, 'destroy']);
+Route::get('stocks', [StockController::class, 'index']);
+Route::get('shopStocks/{name}', [StockController::class, 'shopStocks']);
+Route::post('create-stocks', [StockController::class, 'store']);
+Route::get('get-stocks/{id}', [StockController::class, 'show']);
+Route::put('update-stocks/{id}', [StockController::class, 'update']);
+Route::put('update-stock-status/{id}', [StockController::class, 'updateStatus']);
+Route::delete('delete-stocks/{id}', [StockController::class, 'destroy']);
 
 //product routes
 Route::get('viewproduct', [ProductController::class, 'index']);

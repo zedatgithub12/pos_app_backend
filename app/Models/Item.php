@@ -10,14 +10,19 @@ class Item extends Model
     use HasFactory;
 
     protected $fillable = [
-        'item_picture',
+        'item_image',
         'item_name',
         'item_code',
         'item_category',
         'item_sub_category',
         'item_brand',
-        'item_description',
+        'item_unit',
         'item_price',
+        'item_description',
         'item_status',
+    ];
+
+    protected $casts = [
+        'item_image' => 'string'
     ];
 }
