@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PriceUpdates;
 use App\Models\Replanish;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;

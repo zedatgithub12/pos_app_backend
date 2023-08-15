@@ -56,7 +56,7 @@ class StockController extends Controller
         if ($checkStock) {
             return response()->json([
                 'success' => false,
-                'message' => 'The stock already exist in this shop',
+                'message' => 'The item already exist in this shop',
             ], 202);
         } else {
             // Create the stock
@@ -70,7 +70,7 @@ class StockController extends Controller
                 'stock_price' => $request->input('stock_price'),
                 'stock_quantity' => $request->input('stock_quantity'),
                 'stock_expire_date' => $request->input('stock_expire_date'),
-                'stock_status' => $request->input('stock_status')
+                'stock_status' => 'In-Stock'
             ]);
             if ($stock) {
                 return response()->json([
@@ -102,7 +102,7 @@ class StockController extends Controller
         $updates = PriceUpdates::where('productid', $id)->orderByDesc('id')->take(20)
             ->get();
         $Availability = Stock::where('item_code', $stock->item_code)
-            ->where('stock_status', 'In-stock')
+            ->where('stock_status', 'In-Stock')
             ->take(20)
             ->get();
 
@@ -129,9 +129,13 @@ class StockController extends Controller
 
     public function update(Request $request, $id)
     {
+        $itemCode = $request->input('item_code');
+        $itemName = $request->input('item_name');
         $stock = Stock::find($id);
 
         $stock->update([
+            'item_code' => $itemCode,
+            'item_name' => $itemName,
             'stock_shop' => $request->input('stock_shop'),
             'stock_cost' => $request->input('stock_cost'),
             'stock_unit' => $request->input('stock_unit'),
@@ -139,7 +143,6 @@ class StockController extends Controller
             'stock_price' => $request->input('stock_price'),
             'stock_quantity' => $request->input('stock_quantity'),
             'stock_expire_date' => $request->input('stock_expire_date'),
-            'stock_status' => $request->input('stock_status')
         ]);
 
         if ($stock) {
@@ -160,12 +163,12 @@ class StockController extends Controller
 
 
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(Request $request, string $id)
     {
         $stock = Stock::find($id);
 
         if ($stock) {
-            $newStatus = $request->input('new_status');
+            $newStatus = $request->input('stock_status');
             $stock->update(['stock_status' => $newStatus]);
 
             return response()->json([

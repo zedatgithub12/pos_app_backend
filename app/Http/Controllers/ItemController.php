@@ -21,6 +21,17 @@ class ItemController extends Controller
             'data' => $items
         ]);
     }
+
+    public function getAllItems()
+    {
+
+        $items = Item::orderByDesc('id')->get();
+        return response()->json([
+            'success' => true,
+            'message' => 'Items retrieved successfully',
+            'data' => $items
+        ]);
+    }
     public function store(Request $request)
     {
         // Generate item code

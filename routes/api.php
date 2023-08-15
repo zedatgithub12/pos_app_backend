@@ -72,6 +72,7 @@ Route::post("updateStatus", [ShopStatusController::class, 'update']);
 
 // items route
 Route::get('items', [ItemController::class, 'index']);
+Route::get('getallitems', [ItemController::class, 'getAllItems']);
 Route::post('add-items', [ItemController::class, 'store']);
 Route::get('get-items/{id}', [ItemController::class, 'show']);
 Route::post('update-items/{id}', [ItemController::class, 'update']);
@@ -82,7 +83,7 @@ Route::get('stocks', [StockController::class, 'index']);
 Route::get('shopStocks/{name}', [StockController::class, 'shopStocks']);
 Route::post('create-stocks', [StockController::class, 'store']);
 Route::get('get-stocks/{id}', [StockController::class, 'show']);
-Route::put('update-stocks/{id}', [StockController::class, 'update']);
+Route::post('update-stocks/{id}', [StockController::class, 'update']);
 Route::put('update-stock-status/{id}', [StockController::class, 'updateStatus']);
 Route::delete('delete-stocks/{id}', [StockController::class, 'destroy']);
 
