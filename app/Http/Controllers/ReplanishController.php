@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Replanish;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 
 class ReplanishController extends Controller
@@ -36,21 +37,20 @@ class ReplanishController extends Controller
      */
     public function store(Request $request)
     {
+        $stock = Stock::find($request->stock_id);
         $Replanish = new Replanish();
         $Replanish->shop_id = $request->shopid;
         $Replanish->shop_name = $request->shopname;
         $Replanish->stock_id = $request->stock_id;
         $Replanish->stock_name = $request->stock_name;
         $Replanish->stock_code = $request->stock_code;
-        $Replanish->existing_amount = $request->existing_amount;
+        $Replanish->existing_amount = $stock->stock_quantity;
         $Replanish->added_amount = $request->added_amount;
         $Replanish->user_id = $request->userid;
 
         if ($Replanish->save()) {
-            $product = Product::find($request->stock_id);
-
-            $product->quantity += $request->added_amount;
-            if ($product->save()) {
+            $stock->stock_quantity += $request->added_amount;
+            if ($stock->save()) {
                 return response()->json(['success' => true, 'message' => 'Replanished successfully'], 200);
             }
         } else {
