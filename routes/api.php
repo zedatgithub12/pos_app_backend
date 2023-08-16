@@ -81,6 +81,7 @@ Route::delete('delete-items/{id}', [ItemController::class, 'destroy']);
 // stock routes
 Route::get('stocks', [StockController::class, 'index']);
 Route::get('shopStocks/{name}', [StockController::class, 'shopStocks']);
+Route::get('getShopStocks/{name}', [StockController::class, 'getShopStocks']);
 Route::post('create-stocks', [StockController::class, 'store']);
 Route::get('get-stocks/{id}', [StockController::class, 'show']);
 Route::post('update-stocks/{id}', [StockController::class, 'update']);

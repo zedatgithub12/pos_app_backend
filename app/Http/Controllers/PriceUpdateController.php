@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\PriceUpdates;
 use App\Models\Product;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 use App\Models\Store;
 
@@ -28,12 +29,11 @@ class PriceUpdateController extends Controller
      */
     public function store(Request $request)
     {
-        $shop = Store::where('name', $request->name)->firstOrFail();
+        $shop = Store::where('name', $request->name)->first();
         if (!$shop) {
             return response()->json([
                 'success' => false,
                 'message' => 'Can not find shop id.',
-                'data' => $shop
             ], 402);
         }
         $newPrice = new PriceUpdates([
@@ -46,20 +46,20 @@ class PriceUpdateController extends Controller
         ]);
         $newPrice->save();
 
-        $product = Product::find($request->productid);
+        $product = Stock::find($request->productid);
         if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'can not update price.',
+                'message' => 'Can not find the item',
 
             ], 402);
         }
-        $product->price = $newPrice->to;
+        $product->stock_price = $newPrice->to;
         $product->save();
 
-        $shop = Store::where('name', $product->shop)->first();
+        $shop = Store::where('name', $product->stock_shop)->first();
         $Notification = new Notification();
-        $Notification->title = $product->name . " Price is Updated";
+        $Notification->title = $product->item_name . " Price is Updated";
         $Notification->time = date('H:i:s');
         $Notification->message = "Changed from " . $request->from . " to " . $newPrice->to;
         $Notification->type = 'stock';
@@ -79,12 +79,11 @@ class PriceUpdateController extends Controller
 
     public function updateallprice(Request $request)
     {
-        $shop = Store::where('name', $request->name)->firstOrFail();
+        $shop = Store::where('name', $request->name)->first();
         if (!$shop) {
             return response()->json([
                 'success' => false,
                 'message' => 'Can not find shop id.',
-                'data' => $shop
             ], 402);
         }
         $newPrice = new PriceUpdates([
@@ -96,39 +95,42 @@ class PriceUpdateController extends Controller
             'status' => 'unseen',
         ]);
         $newPrice->save();
-
-        $product = Product::where('code', $request->productcode)->get();
+        $status = "In-Stock";
+        $product = Stock::where('item_code', $request->productcode)->where('stock_status', $status)->get();
         if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'can not update price.',
+                'message' => 'can not apply price update to all shops',
 
             ], 402);
         }
 
         // Update the price for each product
         foreach ($product as $stock) {
-            $stock->price = $newPrice->to;
+            $stock->stock_price = $newPrice->to;
             $stock->save();
 
-            $shop = Store::where('name', $stock->shop)->first();
-            $Notification = new Notification();
-            $Notification->title = $stock->name . "Price is Updated";
-            $Notification->time = date('H:i:s');
-            $Notification->message = "Changed from " . $request->from . " to " . $newPrice->to;
-            $Notification->type = 'stock';
-            $Notification->itemid = $stock->id;
-            $Notification->recipient = $shop->id;
-            $Notification->status = "seen";
-            $Notification->salesstatus = "unseen";
+            $shop = Store::where('name', $stock->stock_shop)->first();
+            if ($shop) {
+                $Notification = new Notification();
+                $Notification->title = $stock->item_name . "Price is Updated";
+                $Notification->time = date('H:i:s');
+                $Notification->message = "Changed from " . $request->from . " to " . $newPrice->to;
+                $Notification->type = 'stock';
+                $Notification->itemid = $stock->id;
+                $Notification->recipient = $shop->id;
+                $Notification->status = "seen";
+                $Notification->salesstatus = "unseen";
 
-            $Notification->save();
+                $Notification->save();
+            }
+
         }
 
 
         return response()->json([
             'success' => true,
-            'message' => 'Price Updated successfully.',
+            'message' => 'Price update applied to all item succeed',
 
         ], 201);
     }

@@ -36,15 +36,31 @@ class StockController extends Controller
     {
         $page = $request->query('page', 1);
         $perPage = $request->query('limit', 15);
-        $products = Stock::where('stock_shop', '=', $name)->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+        $stocks = Stock::join('items', 'stocks.item_code', '=', 'items.item_code')
+            ->select('stocks.*', 'items.item_image', 'items.item_category', 'items.item_sub_category', 'items.item_brand', 'items.item_status')->where('stock_shop', '=', $name)
+            ->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'message' => 'shop stock retrived successfully',
+            'data' => $stocks
         ], 200);
 
     }
 
+    public function getShopStocks(string $name)
+    {
+        $stocks = Stock::join('items', 'stocks.item_code', '=', 'items.item_code')
+            ->select('stocks.*', 'items.item_image', 'items.item_category', 'items.item_sub_category', 'items.item_brand', 'items.item_status')->where('stock_shop', '=', $name)->where('stock_status', 'In-Stock')
+            ->orderByDesc('id')->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'shop stock retrived successfully',
+            'data' => $stocks
+        ], 200);
+
+    }
     public function store(Request $request)
     {
         // Generate item code
