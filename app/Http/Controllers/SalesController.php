@@ -83,6 +83,7 @@ class SalesController extends Controller
         foreach ($items as $item) {
 
             $product = Product::find($item['id']);
+            
             $newQuantity = $product->quantity - $item['quantity'];
             if ($newQuantity <= 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);

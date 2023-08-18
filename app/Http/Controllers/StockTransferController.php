@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Notification;
 use App\Models\Product;
+use App\Models\Stock;
 use App\Models\StockTransfer;
+use App\Models\TransferedItems;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
@@ -30,26 +32,6 @@ class StockTransferController extends Controller
 
         $message = [];
 
-        foreach ($items as $item) {
-            $code = $item['code'];
-            $quantity = $item['quantity'];
-
-            // Check if the quantity to be transferred is less than the quantity in the sender shop
-            $senderShopQuantity = $this->getShopItemQuantity($senderShopName, $code);
-
-            if ($quantity <= $senderShopQuantity) {
-                // Deduct the quantity from sender shop
-                $this->deductQuantityFromShop($senderShopName, $code, $quantity);
-
-                // Add the quantity to receiver shop
-                $this->addQuantityToShop($senderShopName, $receiverShopName, $code, $quantity);
-            } else {
-                // Quantity to be transferred is more than available quantity in sender shop
-                $message[] = "Insufficient quantity for item with code: $code";
-            }
-        }
-
-        // Store the message object and return at the end of transfer
         $transfer = new StockTransfer();
         $transfer->sendershopid = $senderShopId;
         $transfer->sendershopname = $request->sendershopname;
@@ -61,6 +43,35 @@ class StockTransferController extends Controller
         $transfer->status = count($message) > 0 ? 'partially' : 'done';
 
         if ($transfer->save()) {
+            foreach ($request->items as $item) {
+
+                $code = $item["item_code"];
+                $quantity = $item["stock_quantity"];
+
+                $senderShopQuantity = $this->getShopItemQuantity($senderShopName, $code); //get sender shop current stock balance
+
+                if ($senderShopQuantity >= $quantity) {
+                    $stock = Stock::where('stock_shop', $senderShopName)->where('item_code', $code)->first();
+                    $stock->stock_quantity -= $quantity;
+                    $stock->save();
+
+                    $this->addQuantityToShop($senderShopName, $receiverShopName, $code, $quantity);
+                } else {
+                    // Quantity to be transferred is more than available quantity in sender shop
+                    $message[] = "Insufficient quantity for item with code: $code";
+                }
+
+                $newtransfer = new TransferedItems();
+                $newtransfer->transfer_id = $transfer->id;
+                $newtransfer->item_name = $item["item_name"];
+                $newtransfer->item_code = $item["item_code"];
+                $newtransfer->item_unit = $item["stock_unit"];
+                $newtransfer->item_price = $item["stock_price"];
+                $newtransfer->existing_amount = $item["existing"];
+                $newtransfer->transfered_amount = $item["stock_quantity"];
+                $newtransfer->save();
+
+            }
 
             $Notification = new Notification();
             $Notification->title = "Stocks Transfer";
@@ -71,13 +82,11 @@ class StockTransferController extends Controller
             $Notification->recipient = $receiverShopId;
             $Notification->status = "unseen";
             $Notification->salesstatus = "unseen";
-
             $Notification->save();
 
             return response()->json(['success' => true, 'message' => 'Items transfer is done!', 'data' => $items], 200);
         } else {
-            return response()->json(['success' => false, 'message' => 'Items transfer is failed!', 'data' => $items], 500);
-
+            return response()->json(['success' => false, 'message' => 'Item transfer is faild!', 'data' => $items], 500);
         }
 
     }
@@ -86,49 +95,47 @@ class StockTransferController extends Controller
     {
         // Implement your logic to retrieve the quantity of the item in the shop
         // Return the quantity
-        $ItemInShop = Product::where('shop', $shop)->where('code', $code)->first();
-        return $ItemInShop->quantity;
-    }
-
-    private function deductQuantityFromShop($shop, $code, $quantity)
-    {
-        // Implement your logic to deduct the quantity from the shop
-        $product = Product::where('shop', $shop)->where('code', $code)->first();
-        $product->quantity -= $quantity;
-        $product->save();
+        $ItemInShop = Stock::where('stock_shop', $shop)->where('item_code', $code)->first();
+        return $ItemInShop->stock_quantity;
     }
 
     private function addQuantityToShop($senderShopName, $shop, $code, $quantity)
     {
-        $product = Product::where('shop', $shop)->where('code', $code)->first();
+        $Item = Stock::where('stock_shop', $shop)->where('item_code', $code)->first();
 
-        if ($product) {
-            $product->quantity += $quantity;
-            $product->save();
+        if ($Item) {
+            $Item->stock_quantity += $quantity;
+            $Item->save();
+
+            if ($Item->save()) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             // Handle the case where the product is not found
             // For example, you can log an error or throw an exception
             // You can also add a message to the $message array to indicate the issue
 
-            $ItemInShop = Product::where('shop', $senderShopName)->where('code', $code)->first();
+            $ItemInShop = Stock::where('stock_shop', $senderShopName)->where('item_code', $code)->first();
 
-            $product = new Product();
-            $product->picture = $ItemInShop->picture;
-            $product->name = $ItemInShop->name;
-            $product->category = $ItemInShop->category;
-            $product->sub_category = $ItemInShop->sub_category;
-            $product->brand = $ItemInShop->brand;
-            $product->code = $code;
-            $product->cost = $ItemInShop->cost;
-            $product->unit = $ItemInShop->unit;
-            $product->price = $ItemInShop->price;
-            $product->min_quantity = $quantity;
-            $product->origional_quantity = $quantity;
-            $product->quantity = $quantity;
-            $product->description = $ItemInShop->description;
-            $product->shop = $shop;
-            $product->status = $ItemInShop->status;
-            $product->save();
+            $item = new Stock();
+            $item->item_code = $ItemInShop->item_code;
+            $item->item_name = $ItemInShop->item_name;
+            $item->stock_shop = $shop;
+            $item->stock_cost = $ItemInShop->stock_cost;
+            $item->stock_unit = $ItemInShop->stock_unit;
+            $item->stock_min_quantity = $ItemInShop->stock_min_quantity;
+            $item->stock_price = $ItemInShop->stock_price;
+            $item->stock_quantity = $quantity;
+            $item->stock_expire_date = $ItemInShop->stock_expire_date;
+            $item->stock_status = 'In-Stock';
+
+            if ($item->save()) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -148,35 +155,27 @@ class StockTransferController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $transfer = StockTransfer::findOrFail($id);
+        $transfer = StockTransfer::find($id);
+        if ($transfer) {
+            if ($request->has('note')) {
+                $transfer->note = $request->note;
+            }
+            if ($request->has('userid')) {
+                $transfer->userid = $request->userid;
+            }
+            if ($transfer->save()) {
+                return response()->json(['success' => true, 'message' => 'Transfer updated successfully']);
 
-        if ($request->has('sendershopid')) {
-            $transfer->sendershopid = $request->sendershopid;
-        }
-        if ($request->has('sendershopname')) {
-            $transfer->sendershopname = $request->sendershopname;
-        }
-        if ($request->has('receivershopid')) {
-            $transfer->receivershopid = $request->receivershopid;
-        }
+            } else {
+                return response()->json(['success' => false, 'message' => 'Cannot update transfer']);
 
-        if ($request->has('receivershopname')) {
-            $transfer->receivershopname = $request->receivershopname;
-        }
-
-        if ($request->has('note')) {
-            $transfer->note = $request->note;
-        }
-        if ($request->has('userid')) {
-            $transfer->userid = $request->userid;
-        }
-        if ($transfer->save()) {
-            return response()->json(['success' => true, 'message' => 'Transfer updated successfully']);
-
+            }
         } else {
-            return response()->json(['success' => false, 'message' => 'Cannot update transfer']);
+
+            return response()->json(['success' => false, 'message' => 'The record is not found in database']);
 
         }
+
     }
 
     /**
