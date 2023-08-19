@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PackagedItem;
 use App\Models\Packages;
 use Illuminate\Http\Request;
 
@@ -10,20 +11,23 @@ class PackageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $packages = Packages::orderByDesc('id')->get();
-
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+        $packages = Packages::orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
         return response()->json([
             'success' => true,
             'data' => $packages
         ], 200);
     }
 
-    public function storepackages(string $id)
+    public function storepackages(Request $request, string $id)
     {
+        $page = $request->query('page', 1);
+        $perPage = $request->query('limit', 15);
+        $packages = Packages::where('shopid', '=', $id)->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
 
-        $packages = Packages::where('shopid', '=', $id)->orderByDesc('id')->get();
         return response()->json([
             'success' => true,
             'data' => $packages
@@ -47,7 +51,17 @@ class PackageController extends Controller
         $package->status = "active";
 
         if ($package->save()) {
-            return response()->json(['success' => true, 'message' => 'package created successfully']);
+            foreach ($request->items as $item) {
+                $packagedItem = new PackagedItem();
+                $packagedItem->package_id = $package->id;
+                $packagedItem->stock_id = $item["id"];
+                $packagedItem->item_name = $item["item_name"];
+                $packagedItem->item_code = $item["item_code"];
+                $packagedItem->item_sku = $item["item_sku"];
+                $packagedItem->item_quantity = $item["item_quantity"];
+                $packagedItem->save();
+            }
+            return response()->json(['success' => true, 'message' => 'Package created successfully']);
         } else {
             return response()->json(['success' => false, 'message' => 'unable to create package']);
         }
@@ -114,13 +128,18 @@ class PackageController extends Controller
      */
     public function destroy(string $id)
     {
-        $packages = Packages::find($id);
-        if (!$packages) {
-            return response()->json(['success' => false, 'message' => 'package not found'], 404);
+        $package = Packages::find($id);
+
+        if (!$package) {
+            return response()->json(['success' => false, 'message' => 'Package not found'], 404);
         }
-        $packages->delete();
 
-        return response()->json(['success' => true, 'message' => 'package deleted successfully']);
+        // Delete the dependent records from the `packaged_items` table
+        PackagedItem::where('package_id', $id)->delete();
 
+        // Delete the package from the `packages` table
+        $package->delete();
+
+        return response()->json(['success' => true, 'message' => 'Package deleted successfully']);
     }
 }

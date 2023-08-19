@@ -4,6 +4,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\PackagedItemController;
 use App\Http\Controllers\PriceUpdateController;
 use App\Http\Controllers\ReplanishController;
 use App\Http\Controllers\ResetPasswordController;
@@ -103,6 +104,14 @@ Route::get('/packages/{id}', [PackageController::class, 'show']);
 Route::post('addpackage', [PackageController::class, 'store']);
 Route::put('updatepackage/{id}', [PackageController::class, 'update']);
 Route::delete('deletepackage/{id}', [PackageController::class, 'destroy']);
+
+//packaged item routes
+Route::get('packaged-items', [PackagedItemController::class, 'index']);
+Route::post('packaged-items', [PackagedItemController::class, 'store']);
+Route::get('packaged-single/{id}', [PackagedItemController::class, 'show']);
+Route::get('packaged-items/{id}', [PackagedItemController::class, 'getPackagedItems']);
+Route::put('packaged-items/{packagedItem}', [PackagedItemController::class, 'update']);
+Route::delete('packaged-items/{packagedItem}', [PackagedItemController::class, 'destroy']);
 
 //package sale routes 
 Route::get('viewsoldpackages', [SoldPackageController::class, 'getPackages']);

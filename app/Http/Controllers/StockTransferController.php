@@ -76,7 +76,7 @@ class StockTransferController extends Controller
             $Notification = new Notification();
             $Notification->title = "Stocks Transfer";
             $Notification->time = date('H:i:s');
-            $Notification->message = "Stocks are transferred from" . $request->sendershopname . " to " . $request->receivershopname;
+            $Notification->message = "Stocks are transferred from " . $request->sendershopname . " to " . $request->receivershopname;
             $Notification->type = 'transfer';
             $Notification->itemid = $transfer->id;
             $Notification->recipient = $receiverShopId;
