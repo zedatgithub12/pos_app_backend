@@ -75,13 +75,6 @@ class PackageController extends Controller
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -120,7 +113,7 @@ class PackageController extends Controller
 
         $packages->save();
 
-        return response()->json(['success' => true, 'message' => 'packages updated successfully']);
+        return response()->json(['success' => true, 'message' => 'Package updated successfully']);
     }
 
     /**

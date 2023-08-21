@@ -16,11 +16,31 @@ class PackagedItemController extends Controller
         ]);
     }
 
-    public function create()
+    public function addNewItem(Request $request, string $id)
     {
-        // Not applicable for API
-    }
+        $packagedItem = new PackagedItem();
+        $packagedItem->package_id = $id;
+        $packagedItem->stock_id = $request["id"];
+        $packagedItem->item_name = $request["item_name"];
+        $packagedItem->item_code = $request["item_code"];
+        $packagedItem->item_sku = $request["item_sku"];
+        $packagedItem->item_quantity = $request["item_quantity"];
 
+        if ($packagedItem->save()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Package item added successfully',
+                'data' => $packagedItem
+            ], 201);
+        } else {
+            return response()->json([
+                'success' => true,
+                'message' => 'Unable to add new item',
+
+            ], 424);
+        }
+
+    }
     public function store(Request $request)
     {
         $validatedData = $request->validate([
@@ -64,6 +84,7 @@ class PackagedItemController extends Controller
             'data' => $packagedItem
         ]);
     }
+
     public function update(Request $request, PackagedItem $packagedItem)
     {
         $validatedData = $request->validate([
@@ -90,13 +111,59 @@ class PackagedItemController extends Controller
         ]);
     }
 
-    public function destroy(PackagedItem $packagedItem)
+    public function updateItemQuantity(Request $request, string $id)
     {
-        $packagedItem->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Package item deleted successfully'
+        $validatedData = $request->validate([
+            'item_quantity' => 'required|integer',
         ]);
+
+        $packagedItem = PackagedItem::find($id);
+        if ($packagedItem) {
+            $packagedItem->item_quantity = $validatedData['item_quantity'];
+
+            if ($packagedItem->save()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Package item updated successfully',
+                    'data' => $packagedItem
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot update the quantity',
+
+                ]);
+            }
+
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'The item is not found',
+
+            ]);
+        }
+
+
+
+
+    }
+    public function destroy(string $id)
+    {
+        $packagedItem = PackagedItem::find($id);
+
+        if ($packagedItem) {
+            $packagedItem->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Package item deleted successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Package item is not found'
+            ]);
+        }
+
     }
 }

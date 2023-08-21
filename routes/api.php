@@ -108,10 +108,12 @@ Route::delete('deletepackage/{id}', [PackageController::class, 'destroy']);
 //packaged item routes
 Route::get('packaged-items', [PackagedItemController::class, 'index']);
 Route::post('packaged-items', [PackagedItemController::class, 'store']);
+Route::post('add-packaged-items/{id}', [PackagedItemController::class, 'addNewItem']);
 Route::get('packaged-single/{id}', [PackagedItemController::class, 'show']);
 Route::get('packaged-items/{id}', [PackagedItemController::class, 'getPackagedItems']);
 Route::put('packaged-items/{packagedItem}', [PackagedItemController::class, 'update']);
-Route::delete('packaged-items/{packagedItem}', [PackagedItemController::class, 'destroy']);
+Route::put('single-package-item/{id}', [PackagedItemController::class, 'updateItemQuantity']);
+Route::delete('packaged-items/{id}', [PackagedItemController::class, 'destroy']);
 
 //package sale routes 
 Route::get('viewsoldpackages', [SoldPackageController::class, 'getPackages']);
