@@ -83,7 +83,7 @@ class SalesController extends Controller
         foreach ($items as $item) {
 
             $product = Product::find($item['id']);
-            
+
             $newQuantity = $product->quantity - $item['quantity'];
             if ($newQuantity <= 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);
@@ -131,11 +131,10 @@ class SalesController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $sale = Sale::findOrFail($id);
+        $sale = Sale::find($id);
         $sale->user = $request->user;
         $sale->shop = $request->shop;
         $sale->customer = $request->customer;
-        $sale->items = json_encode($request->products);
         $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;

@@ -11,6 +11,7 @@ use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ShopStatController;
 use App\Http\Controllers\ShopStatusController;
 use App\Http\Controllers\ShopTargetController;
+use App\Http\Controllers\SoldItemController;
 use App\Http\Controllers\SoldPackageController;
 use App\Http\Controllers\StockTransferController;
 use App\Http\Controllers\SubCategoryController;
@@ -122,6 +123,8 @@ Route::get('viewstorepackagesale/{name}', [SoldPackageController::class, 'storep
 Route::post('updatepackagesale/{id}', [SoldPackageController::class, 'update']);
 Route::delete('deletepackagesale/{id}', [SoldPackageController::class, 'destroy']);
 
+
+
 //Category routes
 Route::get('viewcategory', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
@@ -143,6 +146,13 @@ Route::post('createsale', [SalesController::class, 'store']);
 Route::post('updatesale/{id}', [SalesController::class, 'update']);
 Route::delete('deletesale/{id}', [SalesController::class, 'destroy']);
 
+//sold item routes 
+Route::get('sold_items', [SoldItemController::class, 'index']);
+Route::post('sold_items', [SoldItemController::class, 'store']);
+Route::get('sold_items/{id}', [SoldItemController::class, 'show']);
+Route::put('sold_items/{id}', [SoldItemController::class, 'update']);
+Route::delete('sold_items/{id}', [SoldItemController::class, 'destroy']);
+
 //targets
 Route::get('targets', [ShopTargetController::class, 'index']);
 Route::get('singleshop/{id}', [ShopTargetController::class, 'show']);
@@ -153,6 +163,7 @@ Route::delete('deletetarget/{id}', [ShopTargetController::class, 'destroy']);
 // Customers routes
 Route::get('viewcustomer', [CustomerController::class, 'index']);
 Route::get('viewstorecustomer/{name}', [CustomerController::class, 'storecustomer']);
+Route::get('customer-details/{id}', [CustomerController::class, 'getCustomerPurchaseDetails']);
 Route::post('addcustomer', [CustomerController::class, 'store']);
 Route::post('updatecustomer/{id}', [CustomerController::class, 'update']);
 Route::delete('deletecustomer/{id}', [CustomerController::class, 'destroy']);

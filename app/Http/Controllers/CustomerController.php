@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\Sale;
+use App\Models\sold_item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -30,13 +33,6 @@ class CustomerController extends Controller
             'data' => $customers
         ], 200);
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -58,20 +54,49 @@ class CustomerController extends Controller
         return response()->json(['success' => true, 'message' => 'Customer added successfully.']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+
+    public function getCustomerPurchaseDetails(string $id)
     {
-        //
+        $customers = Customer::find($id);
+
+        if ($customers) {
+            $customername = $customers->name;
+            // Calculate total spend
+            $totalSpend = Sale::where('customer', $customername)->sum('grandtotal');
+
+            // Calculate number of times bought
+            $numberOfPurchases = Sale::where('customer', $customername)->count();
+
+            $frequentItems = sold_item::join('sales', 'sold_items.sale_id', '=', 'sales.id')
+                ->join('stocks', 'sold_items.product_id', '=', 'stocks.id')
+                ->where('sales.customer', $customername)
+                ->select('sold_items.product_id', 'stocks.item_code', 'stocks.item_name', DB::raw('SUM(sold_items.quantity) as totalQuantity'))
+                ->groupBy('sold_items.product_id', 'stocks.item_code', 'stocks.item_name')
+                ->orderByDesc('totalQuantity')
+                ->take(5)
+                ->get();
+
+            // Get buying record of customer
+            $buyingRecord = Sale::where('customer', $customername)->get();
+            return response()->json([
+                'success' => true,
+                'message' => "Customer Details",
+                'total_spend' => $totalSpend,
+                'number_of_purchases' => $numberOfPurchases,
+                'frequent_items' => $frequentItems,
+                'data' => $buyingRecord,
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => "Customer is not found",
+
+            ], 404);
+        }
+
+
+
     }
 
     /**
