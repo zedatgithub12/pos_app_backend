@@ -78,7 +78,7 @@ class CustomerController extends Controller
                 ->get();
 
             // Get buying record of customer
-            $buyingRecord = Sale::where('customer', $customername)->get();
+            $buyingRecord = Sale::where('customer', $customername)->orderByDesc('id')->get();
             return response()->json([
                 'success' => true,
                 'message' => "Customer Details",

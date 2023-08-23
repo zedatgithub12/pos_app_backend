@@ -15,8 +15,6 @@ class SoldPackage extends Model
         'customer',
         'p_name',
         'items',
-        'tax',
-        'discount',
         'payment_status',
         'payment_method',
         'note',

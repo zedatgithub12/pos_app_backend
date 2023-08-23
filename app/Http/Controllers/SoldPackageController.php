@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notification;
 use App\Models\Product;
 use App\Models\SoldPackage;
+use App\Models\Stock;
 use App\Models\Store;
 use Illuminate\Http\Request;
 
@@ -58,8 +59,6 @@ class SoldPackageController extends Controller
         $sale->customer = $request->customer;
         $sale->p_name = $request->pname;
         $sale->items = json_encode($request->products);
-        $sale->tax = $request->tax;
-        $sale->discount = $request->discount;
         $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;
@@ -71,21 +70,21 @@ class SoldPackageController extends Controller
 
         $items = json_decode($sale->items, true);
         foreach ($items as $item) {
-            $product = Product::find($item['id']);
-            $newQuantity = $product->quantity - $item['quantity'];
+            $stock = Stock::find($item['id']);
+            $newQuantity = $stock->stock_quantity - $item['quantity'];
             if ($newQuantity < 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);
             }
-            $product->quantity = $newQuantity;
-            if ($newQuantity == 0) {
-                $product->status = 'out-stock';
-                $shop = Store::where('name', $product->shop)->first();
+            $stock->stock_quantity = $newQuantity;
+            if ($newQuantity === 0) {
+                $stock->status = 'out-stock';
+                $shop = Store::where('name', $stock->shop)->first();
                 $Notification = new Notification();
-                $Notification->title = $product->name . " is ended!";
+                $Notification->title = $stock->name . " is ended!";
                 $Notification->time = date('H:i:s');
-                $Notification->message = $product->name . " is out of stock take action please!";
+                $Notification->message = $stock->name . " is out of stock take action please!";
                 $Notification->type = 'stock';
-                $Notification->itemid = $product->id;
+                $Notification->itemid = $stock->id;
                 $Notification->recipient = $shop->id;
                 $Notification->status = "unseen";
                 $Notification->salesstatus = "unseen";
@@ -93,28 +92,12 @@ class SoldPackageController extends Controller
 
 
             }
-            $product->save();
+            $stock->save();
         }
 
         $sale->save();
 
-        return response()->json(['success' => true, 'message' => 'Stored successfully', 'reference_number' => $referenceNumber]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        return response()->json(['success' => true, 'message' => 'Sold successfully', 'reference_number' => $referenceNumber]);
     }
 
     /**
@@ -122,13 +105,11 @@ class SoldPackageController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $sale = SoldPackage::findOrFail($id);
+        $sale = SoldPackage::find($id);
         $sale->user = $request->user;
         $sale->shop = $request->shop;
         $sale->customer = $request->customer;
         // $sale->items = json_encode($request->items);
-        $sale->tax = $request->tax;
-        $sale->discount = $request->discount;
         $sale->grandtotal = $request->grandTotal;
         $sale->payment_status = $request->payment_status;
         $sale->payment_method = $request->payment_method;
