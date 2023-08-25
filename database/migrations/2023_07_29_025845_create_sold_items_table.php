@@ -18,6 +18,9 @@ return new class extends Migration {
             $table->decimal('price', 8, 2);
             $table->timestamps();
 
+
+            $table->foreign('product_id')->references('id')->on('stocks')->onDelete('cascade');
+
         });
     }
 
