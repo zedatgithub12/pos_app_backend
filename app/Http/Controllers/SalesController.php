@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\sold_item;
+use App\Models\Stock;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use App\Models\Sale;
@@ -82,13 +83,13 @@ class SalesController extends Controller
         $items = json_decode($sale->items, true);
         foreach ($items as $item) {
 
-            $product = Product::find($item['id']);
+            $product = Stock::find($item['id']);
 
-            $newQuantity = $product->quantity - $item['quantity'];
+            $newQuantity = $product->stock_quantity - $item['quantity'];
             if ($newQuantity <= 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);
             }
-            $product->quantity = $newQuantity;
+            $product->stock_quantity = $newQuantity;
 
             if ($newQuantity == 0) {
                 $product->status = 'out-stock';

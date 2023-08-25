@@ -90,7 +90,6 @@ class SoldPackageController extends Controller
                 $Notification->salesstatus = "unseen";
                 $Notification->save();
 
-
             }
             $stock->save();
         }

@@ -24,8 +24,6 @@ return new class extends Migration {
             $table->string('stock_status');
             $table->timestamps();
 
-            $table->foreign('item_code')->references('item_code')->on('items')->onDelete('cascade');
-
         });
     }
 
