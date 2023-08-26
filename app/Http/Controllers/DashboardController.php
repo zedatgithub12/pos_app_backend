@@ -24,6 +24,7 @@ class DashboardController extends Controller
             if ($target) {
                 $startDate = $target->created_at;
                 $lastThirtyDaysSales = $this->getLastThirtyDaysSales($shop, $startDate);
+                $totalmonthlySales = $this->getTotalMonthlySales();
                 $getDailyRevenue = $this->getDailyRevenue($shop);
                 $getMonthlyRevenue = $this->getMonthlyRevenue($shop, $startDate);
                 $getYearlyRevenue = $this->getYearlyRevenue($shop, $startDate);
@@ -32,6 +33,7 @@ class DashboardController extends Controller
                     'success' => true,
                     'data' => [
                         'thirtydays' => $lastThirtyDaysSales,
+                        'monthlytotal' => $totalmonthlySales,
                         'daily' => $getDailyRevenue,
                         'monthly' => $getMonthlyRevenue,
                         'annually' => $getYearlyRevenue,
@@ -66,6 +68,7 @@ class DashboardController extends Controller
                 $monthlyRevenue = Sale::whereMonth('created_at', Carbon::now()->month)->sum('grandTotal');
                 $annualRevenue = Sale::whereYear('created_at', Carbon::now()->year)->sum('grandTotal');
                 $lastThirtyDaysSales = $this->getTotalThirtyDaysSales();
+                $totalmonthlySales = $this->getTotalMonthlySales();
 
                 $dailyRevenue = Sale::whereDate('created_at', Carbon::today())->sum('grandTotal');
                 $monthlyRevenue = Sale::whereMonth('created_at', Carbon::now()->month)->sum('grandTotal');
@@ -83,6 +86,7 @@ class DashboardController extends Controller
                     'success' => true,
                     'data' => [
                         'thirtydays' => $lastThirtyDaysSales,
+                        'monthlytotal' => $totalmonthlySales,
                         'daily' => $totalRevenue,
                         'monthly' => $totalMonthlyRevenue,
                         'annually' => $totalAnnualRevenue,
@@ -121,27 +125,40 @@ class DashboardController extends Controller
 
         $salesArray = [];
 
-        foreach ($sales as $sale) {
-            $salesArray[] = [
-                'date' => $sale->date,
-                'totalRevenue' => $sale->totalRevenue,
-                
-            ];
-        }
 
-        foreach ($soldPackages as $package) {
-            if (isset($salesArray[$package->date])) {
-                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+        foreach ($sales as $sale) {
+            $date = $sale->date;
+            $totalRevenue = $sale->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
             } else {
-                $salesArray[$package->date] = [
-                    'date' => $package->date,
-                    'totalRevenue' => $package->totalRevenue,
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
                 ];
             }
         }
 
-        // return array_values($salesArray);
-        // // return $salesArray;
+        foreach ($soldPackages as $package) {
+            $date = $package->date;
+            $totalRevenue = $package->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
+            } else {
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
+                ];
+            }
+        }
 
         $data = collect($salesArray)->sortByDesc('date')->values()->toArray();
         return $data;
@@ -171,26 +188,87 @@ class DashboardController extends Controller
         $salesArray = [];
 
         foreach ($sales as $sale) {
-            $salesArray[] = [
-                'date' => $sale->date,
-                'totalRevenue' => $sale->totalRevenue,
-            ];
+            $date = $sale->date;
+            $totalRevenue = $sale->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
+            } else {
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
+                ];
+            }
         }
 
         foreach ($soldPackages as $package) {
-            if (isset($salesArray[$package->date])) {
-                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+            $date = $package->date;
+            $totalRevenue = $package->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
             } else {
-                $salesArray[$package->date] = [
-                    'date' => $package->date,
-                    'totalRevenue' => $package->totalRevenue,
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
                 ];
             }
         }
 
         $data = collect($salesArray)->sortByDesc('date')->values()->toArray();
         return $data;
-        // return $salesArray;
+
+    }
+
+    public function getTotalMonthlySales()
+    {
+        $currentYear = Carbon::now()->year;
+        $salesArray = [];
+
+        // Initialize salesArray with all months and totalRevenue set to 0
+        for ($month = 1; $month <= 12; $month++) {
+            $salesArray[Carbon::createFromDate($currentYear, $month, 1)->format('F')] = [
+                'month' => Carbon::createFromDate($currentYear, $month, 1)->format('F'),
+                'totalRevenue' => 0,
+            ];
+        }
+
+        // Fetch and update totalRevenue for each month
+        for ($month = 1; $month <= 12; $month++) {
+            $startDate = Carbon::createFromDate($currentYear, $month, 1)->startOfMonth()->format('Y-m-d');
+            $endDate = Carbon::createFromDate($currentYear, $month, 1)->endOfMonth()->format('Y-m-d');
+
+            $sales = DB::table('sales')
+                ->select(DB::raw("MONTHNAME(created_at) as month"), DB::raw("SUM(grandtotal) as totalRevenue"))
+                ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+                ->groupBy(DB::raw('MONTHNAME(created_at)'))
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            $soldPackages = DB::table('sold_packages')
+                ->select(DB::raw("MONTHNAME(created_at) as month"), DB::raw("SUM(grandtotal) as totalRevenue"))
+                ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+                ->groupBy(DB::raw('MONTHNAME(created_at)'))
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            // Update totalRevenue for the month if it exists
+            if ($sales) {
+                $salesArray[$sales->month]['totalRevenue'] += $sales->totalRevenue;
+            }
+            if ($soldPackages) {
+                $salesArray[$soldPackages->month]['totalRevenue'] += $soldPackages->totalRevenue;
+            }
+        }
+
+        $data = collect($salesArray)->values()->toArray();
+        return $data;
     }
     public function getMonthlyTargets(string $month, Request $request)
     {
@@ -218,19 +296,35 @@ class DashboardController extends Controller
         $salesArray = [];
 
         foreach ($sales as $sale) {
-            $salesArray[] = [
-                'date' => $sale->date,
-                'totalRevenue' => $sale->totalRevenue,
-            ];
+            $date = $sale->date;
+            $totalRevenue = $sale->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
+            } else {
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
+                ];
+            }
         }
 
         foreach ($soldPackages as $package) {
-            if (isset($salesArray[$package->date])) {
-                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+            $date = $package->date;
+            $totalRevenue = $package->totalRevenue;
+
+            // Check if the date already exists in the $salesArray
+            if (isset($salesArray[$date])) {
+                // If the date exists, sum the totalRevenue values
+                $salesArray[$date]['totalRevenue'] += $totalRevenue;
             } else {
-                $salesArray[$package->date] = [
-                    'date' => $package->date,
-                    'totalRevenue' => $package->totalRevenue,
+                // If the date does not exist, create a new entry
+                $salesArray[$date] = [
+                    'date' => $date,
+                    'totalRevenue' => $totalRevenue,
                 ];
             }
         }
