@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\Sale;
+use App\Models\SoldPackage;
 use App\Models\Stock;
 use App\Models\ShopTarget;
 use Carbon\Carbon;
@@ -66,13 +67,25 @@ class DashboardController extends Controller
                 $annualRevenue = Sale::whereYear('created_at', Carbon::now()->year)->sum('grandTotal');
                 $lastThirtyDaysSales = $this->getTotalThirtyDaysSales();
 
+                $dailyRevenue = Sale::whereDate('created_at', Carbon::today())->sum('grandTotal');
+                $monthlyRevenue = Sale::whereMonth('created_at', Carbon::now()->month)->sum('grandTotal');
+                $annualRevenue = Sale::whereYear('created_at', Carbon::now()->year)->sum('grandTotal');
+
+                $dailyPackageRevenue = SoldPackage::whereDate('created_at', Carbon::today())->sum('grandTotal');
+                $monthlyPackageRevenue = SoldPackage::whereMonth('created_at', Carbon::now()->month)->sum('grandTotal');
+                $annualPackageRevenue = SoldPackage::whereYear('created_at', Carbon::now()->year)->sum('grandTotal');
+
+                $totalRevenue = $dailyRevenue + $dailyPackageRevenue;
+                $totalMonthlyRevenue = $monthlyRevenue + $monthlyPackageRevenue;
+                $totalAnnualRevenue = $annualRevenue + $annualPackageRevenue;
+
                 return response()->json([
                     'success' => true,
                     'data' => [
                         'thirtydays' => $lastThirtyDaysSales,
-                        'daily' => $dailyRevenue,
-                        'monthly' => $monthlyRevenue,
-                        'annually' => $annualRevenue,
+                        'daily' => $totalRevenue,
+                        'monthly' => $totalMonthlyRevenue,
+                        'annually' => $totalAnnualRevenue,
                         'target' => $shopTargets[0],
                     ],
                 ], 200);
@@ -98,16 +111,41 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $soldPackages = DB::table('sold_packages')
+            ->select(DB::raw("DATE(created_at) as date"), DB::raw("SUM(grandtotal) as totalRevenue"))
+            ->where('shop', $shop)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $salesArray = [];
 
         foreach ($sales as $sale) {
             $salesArray[] = [
                 'date' => $sale->date,
                 'totalRevenue' => $sale->totalRevenue,
+                
             ];
         }
 
-        return $salesArray;
+        foreach ($soldPackages as $package) {
+            if (isset($salesArray[$package->date])) {
+                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+            } else {
+                $salesArray[$package->date] = [
+                    'date' => $package->date,
+                    'totalRevenue' => $package->totalRevenue,
+                ];
+            }
+        }
+
+        // return array_values($salesArray);
+        // // return $salesArray;
+
+        $data = collect($salesArray)->sortByDesc('date')->values()->toArray();
+        return $data;
+
     }
     public function getTotalThirtyDaysSales()
     {
@@ -120,6 +158,16 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+
+
+        $soldPackages = DB::table('sold_packages')
+            ->select(DB::raw("DATE(created_at) as date"), DB::raw("SUM(grandtotal) as totalRevenue"))
+            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+
         $salesArray = [];
 
         foreach ($sales as $sale) {
@@ -129,7 +177,20 @@ class DashboardController extends Controller
             ];
         }
 
-        return $salesArray;
+        foreach ($soldPackages as $package) {
+            if (isset($salesArray[$package->date])) {
+                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+            } else {
+                $salesArray[$package->date] = [
+                    'date' => $package->date,
+                    'totalRevenue' => $package->totalRevenue,
+                ];
+            }
+        }
+
+        $data = collect($salesArray)->sortByDesc('date')->values()->toArray();
+        return $data;
+        // return $salesArray;
     }
     public function getMonthlyTargets(string $month, Request $request)
     {
@@ -146,6 +207,14 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $soldPackages = DB::table('sold_packages')
+            ->select(DB::raw("DATE(created_at) as date"), DB::raw("SUM(grandtotal) as totalRevenue"))
+            ->where('shop', $shop)
+            ->whereBetween(DB::raw('DATE(created_at)'), [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $salesArray = [];
 
         foreach ($sales as $sale) {
@@ -155,10 +224,23 @@ class DashboardController extends Controller
             ];
         }
 
+        foreach ($soldPackages as $package) {
+            if (isset($salesArray[$package->date])) {
+                $salesArray[$package->date]['totalRevenue'] += $package->totalRevenue;
+            } else {
+                $salesArray[$package->date] = [
+                    'date' => $package->date,
+                    'totalRevenue' => $package->totalRevenue,
+                ];
+            }
+        }
+
+        $data = collect($salesArray)->sortByDesc('date')->values()->toArray();
+
         return response()->json([
             'success' => true,
             'message' => 'monthly sales retrieved successfully',
-            'data' => $salesArray,
+            'data' => $data,
 
         ], 200);
     }
@@ -172,7 +254,14 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('grandtotal');
 
-        return $totalSales;
+        $totalPackageSales = DB::table('sold_packages')
+            ->where('shop', $shop)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('grandtotal');
+
+        $totalRevenue = $totalSales + $totalPackageSales;
+
+        return $totalRevenue;
     }
     public function getMonthlyRevenue($shop, $startDate)
     {
@@ -188,7 +277,15 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('grandtotal');
 
-        return $totalSales;
+        $totalPackageSales = DB::table('sold_packages')
+            ->where('shop', $shop)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('grandtotal');
+
+        $totalRevenue = $totalSales + $totalPackageSales;
+
+
+        return $totalRevenue;
     }
     public function getYearlyRevenue($shop, $startDate)
     {
@@ -204,18 +301,26 @@ class DashboardController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->sum('grandtotal');
 
-        return $totalSales;
+        $totalPackageSales = DB::table('sold_packages')
+            ->where('shop', $shop)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('grandtotal');
+
+        $totalRevenue = $totalSales + $totalPackageSales;
+
+
+        return $totalRevenue;
     }
     public function getProductsByShopAndQuantity(string $name)
     {
         $stock = Stock::where('stock_shop', $name)
             ->whereColumn('stock_quantity', '<=', 'stock_min_quantity')
             ->withCount([
-                'sold_item as quantity' => function ($query) {
+                'sold_item as stock_quantity' => function ($query) {
                     $query->whereMonth('created_at', now()->month);
                 }
             ])
-            ->orderBy('quantity', 'desc')
+            ->orderBy('stock_quantity', 'desc')
             ->get();
 
         return response()->json([

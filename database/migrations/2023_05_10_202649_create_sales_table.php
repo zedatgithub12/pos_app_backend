@@ -16,6 +16,8 @@ return new class extends Migration {
             $table->string('user');
             $table->string('shop');
             $table->string('customer');
+            $table->string('type')->default("direct");
+            $table->string('package_name')->nullable();
             $table->json('items');
             $table->string('payment_status');
             $table->string('payment_method');

@@ -11,9 +11,6 @@ use Illuminate\Http\Request;
 
 class SoldPackageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function getPackages(Request $request)
     {
         $page = $request->query('page', 1);
@@ -67,11 +64,10 @@ class SoldPackageController extends Controller
         $sale->date = date('Y-m-d');
         $sale->time = date('H:i:s');
 
-
         $items = json_decode($sale->items, true);
         foreach ($items as $item) {
             $stock = Stock::find($item['id']);
-            $newQuantity = $stock->stock_quantity - $item['quantity'];
+            $newQuantity = $stock->stock_quantity - $item['item_quantity'];
             if ($newQuantity < 0) {
                 return response()->json(['message' => 'Stock quantity is less than to be sold quantity'], 400);
             }
@@ -94,9 +90,14 @@ class SoldPackageController extends Controller
             $stock->save();
         }
 
-        $sale->save();
+        if ($sale->save()) {
+            return response()->json(['success' => true, 'message' => 'Sold successfully', 'reference_number' => $referenceNumber]);
 
-        return response()->json(['success' => true, 'message' => 'Sold successfully', 'reference_number' => $referenceNumber]);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Unable to create package sale']);
+
+        }
+
     }
 
     /**

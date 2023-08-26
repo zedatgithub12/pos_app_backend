@@ -14,6 +14,8 @@ class Sale extends Model
         'user',
         'shop',
         'customer',
+        'type',
+        'package_name',
         'items',
         'payment_status',
         'payment_method',
