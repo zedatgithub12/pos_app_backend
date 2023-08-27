@@ -102,12 +102,20 @@ class AuthController extends Controller
                     ->select('users.*', 'stores.id as store_id', 'stores.name as store_name')
                     ->first();
 
-                $response = response()->json([
-                    'success' => true,
-                    'access_token' => $token,
-                    'token_type' => 'Bearer',
-                    'user' => $userWithStore,
-                ]);
+                if ($userWithStore == null) {
+                    $response = response()->json([
+                        'success' => false,
+                        'message' => 'You are not assigned to shop yet!',
+                    ]);
+                } else {
+                    $response = response()->json([
+                        'success' => true,
+                        'access_token' => $token,
+                        'token_type' => 'Bearer',
+                        'user' => $userWithStore,
+                    ]);
+                }
+
             } else {
                 // Handle other user roles or invalid roles as needed
                 $response = response()->json([
