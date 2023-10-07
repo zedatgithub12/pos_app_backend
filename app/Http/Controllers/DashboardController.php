@@ -59,9 +59,9 @@ class DashboardController extends Controller
 
                 foreach ($shopTargets as $target) {
 
-                    $r_daily += $target->r_daily;
-                    $r_monthly += $target->r_monthly;
-                    $r_yearly += $target->r_yearly;
+                    $r_daily = $r_daily + $target->r_daily;
+                    $r_monthly = $r_monthly + $target->r_monthly;
+                    $r_yearly = $r_yearly + $target->r_yearly;
                 }
 
                 $dailyRevenue = Sale::whereDate('created_at', Carbon::today())->sum('grandTotal');
@@ -90,7 +90,7 @@ class DashboardController extends Controller
                         'daily' => $totalRevenue,
                         'monthly' => $totalMonthlyRevenue,
                         'annually' => $totalAnnualRevenue,
-                        'target' => $shopTargets[0],
+                        'target' => $this->calculateTotalTargets(),
                     ],
                 ], 200);
             } else {
@@ -103,6 +103,19 @@ class DashboardController extends Controller
         }
     }
 
+    public function calculateTotalTargets()
+    {
+        $totalDailyTarget = ShopTarget::where('status', 'active')->sum('r_daily');
+        $totalMonthlyTarget = ShopTarget::where('status', 'active')->sum('r_monthly');
+        $totalYearlyTarget = ShopTarget::where('status', 'active')->sum('r_yearly');
+
+        $targets = [
+            'r_daily' => $totalDailyTarget,
+            'r_monthly' => $totalMonthlyTarget,
+            'r_yearly' => $totalYearlyTarget,
+        ];
+        return $targets;
+    }
     public function getLastThirtyDaysSales($shop, $startDate)
     {
         $startDate = Carbon::parse($startDate)->subDays(30)->format('Y-m-d');
@@ -225,7 +238,6 @@ class DashboardController extends Controller
         return $data;
 
     }
-
     public function getTotalMonthlySales()
     {
         $currentYear = Carbon::now()->year;
@@ -445,4 +457,32 @@ class DashboardController extends Controller
         return $customers;
     }
 
+    public function retrieveShopData(Request $request)
+    {
+        $option = $request->query('period');
+        $shopData = ShopTarget::select('shopname', 'r_daily', 'r_monthly', 'r_yearly')->where('status', 'active')
+            ->leftJoin('sales', 'shop_targets.shopname', '=', 'sales.shop')
+            ->groupBy('shop_targets.shopname', 'shop_targets.r_daily', 'shop_targets.r_monthly', 'shop_targets.r_yearly');
+
+        switch ($option) {
+            case 'daily':
+                $shopData->selectRaw('SUM(CASE WHEN sales.date = CURDATE() THEN sales.grandtotal ELSE 0 END) as sales_sum');
+                break;
+            case 'monthly':
+                $shopData->selectRaw('SUM(CASE WHEN MONTH(sales.date) = MONTH(CURDATE()) THEN sales.grandtotal ELSE 0 END) as sales_sum');
+                break;
+            case 'annual':
+                $shopData->selectRaw('SUM(CASE WHEN YEAR(sales.date) = YEAR(CURDATE()) THEN sales.grandtotal ELSE 0 END) as sales_sum');
+                break;
+        }
+
+        $shopData = $shopData->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'target retrieved successfully',
+            'data' => $shopData
+        ]);
+
+    }
 }

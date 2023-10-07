@@ -78,9 +78,11 @@ class PackagedItemController extends Controller
 
     public function getPackagedItems(string $id)
     {
-        $packagedItem = PackagedItem::where("package_id", $id)->get();
+        $packagedItem = PackagedItem::join('items', 'packaged_items.item_code', '=', 'items.item_code')->select('packaged_items.*', 'items.item_image', 'items.item_category', 'items.item_sub_category', 'items.item_brand', 'items.item_unit', 'items.item_status')->where("package_id", $id)->get();
+
         return response()->json([
             'success' => true,
+            'message' => 'Package item retrived successfully',
             'data' => $packagedItem
         ]);
     }

@@ -26,6 +26,13 @@ class ShopTargetController extends Controller
     public function store(Request $request)
     {
 
+
+        $checkduplication = ShopTarget::where("shopid", $request->shopid)->where("r_daily", $request->r_daily)->where("r_monthly", $request->r_monthly)->where("r_yearly", $request->r_yearly)->where("status", "active")->first();
+        if ($checkduplication) {
+            return response()->json(['success' => false, 'message' => 'Target already exist'], 422);
+        }
+
+
         $exist = ShopTarget::where("shopid", $request->shopid)->where("status", "active")->exists();
         if ($exist) {
 

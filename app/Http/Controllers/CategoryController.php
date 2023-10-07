@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
+use App\Models\Item;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
@@ -13,10 +16,23 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
+        $subcategories = SubCategory::all();
+        $brand = Brand::all();
+        $skus = Item::select('item_sku')
+            ->whereNotNull('item_sku')
+            ->distinct()
+            ->pluck('item_sku')
+            ->map(function ($sku) {
+                return ['item_sku' => $sku];
+            });
 
         return response()->json([
             'success' => true,
-            'data' => $categories
+            'message' => 'retrived successfully',
+            'data' => $categories,
+            'subcategory' => $subcategories,
+            'brand' => $brand,
+            'skus' => $skus
         ], 200);
     }
 

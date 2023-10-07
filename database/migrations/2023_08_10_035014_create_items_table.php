@@ -19,7 +19,9 @@ return new class extends Migration {
             $table->string('item_sub_category')->nullable();
             $table->string('item_brand');
             $table->string('item_unit');
-            $table->decimal('item_price', 8, 2);
+            $table->string('item_sku');
+            $table->string('item_packaging')->nullable();
+            $table->decimal('item_price', 8, 2)->nullable();
             $table->text('item_description')->nullable();
             $table->string('item_status');
             $table->timestamps();

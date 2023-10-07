@@ -17,7 +17,8 @@ class Item extends Model
         'item_sub_category',
         'item_brand',
         'item_unit',
-        'item_price',
+        'item_sku',
+        'item_packaging',
         'item_description',
         'item_status',
     ];

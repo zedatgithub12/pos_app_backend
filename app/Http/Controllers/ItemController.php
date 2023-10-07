@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\PriceUpdates;
+use App\Models\Product;
 use App\Models\Replanish;
 use App\Models\Stock;
 use Illuminate\Http\Request;
@@ -34,6 +35,16 @@ class ItemController extends Controller
     }
     public function store(Request $request)
     {
+
+        $checkExistance = Item::where('item_category', $request->input('item_category'))->where('item_sub_category', $request->input('item_sub_category'))->where('item_brand', $request->input('item_brand'))->where('item_sku', $request->input('item_sku'))->first();
+        if ($checkExistance) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product is already created',
+
+            ], 422);
+        }
+
         // Generate item code
         $categoryId = $request->input('category_id');
         $lastItemId = Item::latest()->first()->id ?? 0;
@@ -56,6 +67,8 @@ class ItemController extends Controller
             'item_sub_category' => $subCat,
             'item_brand' => $request->input('item_brand'),
             'item_unit' => $request->input('item_unit'),
+            'item_sku' => $request->input('item_sku'),
+            'item_packaging' => $request->input('item_packaging'),
             'item_price' => $request->input('item_price'),
             'item_description' => $request->input('item_description'),
             'item_status' => 'active'
@@ -133,8 +146,12 @@ class ItemController extends Controller
         if ($request->has('item_unit')) {
             $item->item_unit = $request->input('item_unit');
         }
-        if ($request->has('item_price')) {
-            $item->item_price = $request->input('item_price');
+
+        if ($request->has('item_sku')) {
+            $item->item_sku = $request->input('item_sku');
+        }
+        if ($request->has('item_packaging')) {
+            $item->item_packaging = $request->input('item_packaging');
         }
         if ($request->has('item_description')) {
             $item->item_description = $request->input('item_description');
@@ -171,7 +188,29 @@ class ItemController extends Controller
                 'message' => 'Item not found'
             ], 404);
         }
+    }
 
 
+
+    public function updateStatus(Request $request, string $id)
+    {
+        $item = Item::find($id);
+
+        if ($item) {
+            $newStatus = $request->input('product_status');
+            $item->update(['item_status' => $newStatus]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Status updated successfully',
+                'data' => $item
+            ], 200);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'product is not found',
+
+            ], 404);
+        }
     }
 }

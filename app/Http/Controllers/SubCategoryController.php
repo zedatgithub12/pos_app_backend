@@ -37,11 +37,17 @@ class SubCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // Generate item code
+        $categoryId = $request->input('category_id');
+        $lastItemId = SubCategory::latest()->first()->id ?? 0;
+        $code = $categoryId . ($lastItemId + 1);
+
         $sub_category = SubCategory::where('sub_category', $request->sub)->first();
         if ($sub_category) {
             return response()->json(['success' => false, 'message' => 'This sub category already exists.']);
         }
         $sub_category = new SubCategory;
+        $sub_category->code = $code;
         $sub_category->main_category = $request->main;
         $sub_category->sub_category = $request->sub;
         $sub_category->save();

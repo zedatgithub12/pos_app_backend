@@ -45,13 +45,19 @@ class CustomerController extends Controller
             'shop' => 'required',
         ]);
 
-        $customer = new Customer;
-        $customer->name = $request->name;
-        $customer->phone = $request->phone;
-        $customer->shop = $request->shop;
-        $customer->save();
+        $checkExistance = Customer::where('phone', $request->phone)->first();
 
-        return response()->json(['success' => true, 'message' => 'Customer added successfully.']);
+        if ($checkExistance) {
+            return response()->json(['success' => false, 'message' => 'The phone number is already taken'], 422);
+        } else {
+            $customer = new Customer;
+            $customer->name = $request->name;
+            $customer->phone = $request->phone;
+            $customer->shop = $request->shop;
+            $customer->save();
+
+            return response()->json(['success' => true, 'message' => 'Customer added successfully.'], 201);
+        }
     }
 
 

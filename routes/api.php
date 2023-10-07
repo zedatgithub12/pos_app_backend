@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\NotificationController;
@@ -56,10 +57,12 @@ Route::get('againsttarget/{name}', [DashboardController::class, 'getSalesAgainst
 Route::get('lowstock/{name}', [DashboardController::class, 'getProductsByShopAndQuantity']);
 Route::get('customercount', [DashboardController::class, 'totalCustomers']);
 Route::get('monthlytarget/{month}', [DashboardController::class, 'getMonthlyTargets']);
-
+Route::get('shopstarget', [DashboardController::class, 'retrieveShopData']);
 //get statistics
 Route::get('adminstat', [AdminStatController::class, 'Stats']);
 Route::get('shopstat', [ShopStatController::class, 'Stats']);
+Route::get('connection', [AdminStatController::class, 'checkconnection']);
+
 //Store routes
 Route::get('viewstore', [StoreController::class, 'index']);
 Route::get('/stores/{id}', [StoreController::class, 'show']);
@@ -79,8 +82,9 @@ Route::post('add-items', [ItemController::class, 'store']);
 Route::get('get-items/{id}', [ItemController::class, 'show']);
 Route::post('update-items/{id}', [ItemController::class, 'update']);
 Route::delete('delete-items/{id}', [ItemController::class, 'destroy']);
+Route::put('update-product-status/{id}', [ItemController::class, 'updateStatus']);
 
-// stock routes
+//stock routes
 Route::get('stocks', [StockController::class, 'index']);
 Route::get('shopStocks/{name}', [StockController::class, 'shopStocks']);
 Route::get('getShopStocks/{name}', [StockController::class, 'getShopStocks']);
@@ -123,8 +127,6 @@ Route::get('viewstorepackagesale/{name}', [SoldPackageController::class, 'storep
 Route::post('updatepackagesale/{id}', [SoldPackageController::class, 'update']);
 Route::delete('deletepackagesale/{id}', [SoldPackageController::class, 'destroy']);
 
-
-
 //Category routes
 Route::get('viewcategory', [CategoryController::class, 'index']);
 Route::get('/categories/{id}', [CategoryController::class, 'show']);
@@ -139,6 +141,20 @@ Route::post('addsubcategory', [SubCategoryController::class, 'store']);
 Route::post('editsubcategory/{id}', [SubCategoryController::class, 'update']);
 Route::delete('deletesubcategory/{id}', [SubCategoryController::class, 'destroy']);
 
+//brand routes
+Route::get('viewbrand', [BrandController::class, 'index']);
+Route::get('brand/{name}', [BrandController::class, 'show']);
+Route::post('createbrand', [BrandController::class, 'store']);
+Route::post('editbrand/{id}', [BrandController::class, 'update']);
+Route::delete('deletebrand/{id}', [BrandController::class, 'destroy']);
+
+//sku routes
+Route::get('viewsku', [BrandController::class, 'index']);
+Route::get('sku/{name}', [BrandController::class, 'show']);
+Route::post('createsku', [BrandController::class, 'store']);
+Route::post('editsku/{id}', [BrandController::class, 'update']);
+Route::delete('deletesku/{id}', [BrandController::class, 'destroy']);
+
 // Sales routes
 Route::get('viewsale', [SalesController::class, 'getSales']);
 Route::get('viewstoresale/{name}', [SalesController::class, 'storesale']);
@@ -152,6 +168,9 @@ Route::post('sold_items', [SoldItemController::class, 'store']);
 Route::get('sold_items/{id}', [SoldItemController::class, 'show']);
 Route::put('sold_items/{id}', [SoldItemController::class, 'update']);
 Route::delete('sold_items/{id}', [SoldItemController::class, 'destroy']);
+Route::get('filter_sold_item', [SoldItemController::class, 'filterSoldItem']);
+Route::get('export_sold_item', [SoldItemController::class, 'ExportSoldItems']);
+
 
 //targets
 Route::get('targets', [ShopTargetController::class, 'index']);
@@ -184,13 +203,11 @@ Route::get('singlereplanishment/{id}', [ReplanishController::class, 'show']);
 Route::post('newreplanishment', [ReplanishController::class, 'store']);
 Route::delete('deleterecord/{id}', [ReplanishController::class, 'destroy']);
 
-
 //Trafer routes
 Route::get('alltransfers', [StockTransferController::class, 'index']);
 Route::post('transfer', [StockTransferController::class, 'transferItems']);
 Route::post('updatetransfer/{id}', [StockTransferController::class, 'update']);
 Route::delete('deletetransfer/{id}', [StockTransferController::class, 'destroy']);
-
 
 //notification routes
 Route::get('adminnotification', [NotificationController::class, 'index']);

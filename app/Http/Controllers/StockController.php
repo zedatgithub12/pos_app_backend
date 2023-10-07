@@ -51,7 +51,7 @@ class StockController extends Controller
     public function getShopStocks(string $name)
     {
         $stocks = Stock::join('items', 'stocks.item_code', '=', 'items.item_code')
-            ->select('stocks.*', 'items.item_image', 'items.item_category', 'items.item_sub_category', 'items.item_brand', 'items.item_status')->where('stock_shop', '=', $name)->where('stock_status', 'In-Stock')
+            ->select('stocks.*', 'items.item_image', 'items.item_category', 'items.item_sub_category', 'items.item_brand', 'items.item_unit', 'items.item_status')->where('stock_shop', '=', $name)->where('stock_status', 'In-Stock')
             ->orderByDesc('id')->get();
 
         return response()->json([
